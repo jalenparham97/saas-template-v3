@@ -1,5 +1,5 @@
 {
-  "name": "shadcn-ui-monorepo",
+  "name": "saas-template-v3",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -13,9 +13,9 @@
     "@workspace/typescript-config": "*",
     "prettier": "^3.6.2",
     "turbo": "^2.5.5",
-    "typescript": "5.7.3"
+    "typescript": "5.9.3"
   },
-  "packageManager": "bun@1.2.22",
+  "packageManager": "bun@1.2.23",
   "engines": {
     "node": ">=20"
   },

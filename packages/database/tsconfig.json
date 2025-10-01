@@ -1,0 +1,12 @@
+{
+  "extends": "@workspace/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": ["node"], // added: prevent implicit resolution of 'minimatch' from extended config
+    "paths": {
+      "@workspace/db/*": ["./src/*"]
+    }
+  },
+  "include": ["prisma/**/*.ts", "generated/**/*.ts", "src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -4,7 +4,7 @@
     "baseUrl": ".",
     "types": [], // added: prevent implicit resolution of 'minimatch' from extended config
     "paths": {
-      "@workspace/ui/*": ["./src/*"]
+      "@workspace/react-form/*": ["./src/*"]
     }
   },
   "include": ["."],
