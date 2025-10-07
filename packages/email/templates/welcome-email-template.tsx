@@ -15,14 +15,14 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from '@react-email/components';
 
 const APP_NAME = 'SaaS Template';
 
-const baseUrl = "https://www.fireball.email/fireball-assets/";
+const baseUrl = 'https://www.fireball.email/fireball-assets/';
 
 export const WelcomeEmailTemplate = () => {
-  const logoBaseUrl = "https://app.saastemplate.com";
+  const logoBaseUrl = 'https://app.saastemplate.com';
   const currentYear = new Date().getFullYear();
 
   return (
@@ -168,7 +168,7 @@ export const WelcomeEmailTemplate = () => {
 
             <Section className="border-t border-t-[#e5e7eb]">
               <Text className="text-[14px] leading-[24px] text-[#6b7280]">
-                Need help? Contact our support team at{" "}
+                Need help? Contact our support team at{' '}
                 <a
                   href="mailto:support@saastemplate.com"
                   className="text-[#3b82f6] no-underline"

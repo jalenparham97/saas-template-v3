@@ -12,7 +12,7 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from '@react-email/components';
 
 const APP_NAME = 'SaaS Template';
 
@@ -22,10 +22,10 @@ interface Props {
 }
 
 const PasswordResetEmailTemplate = ({
-  link = "http://localhost:3000/auth/reset-password",
-  email = "jalenparham@gmail.com",
+  link = 'http://localhost:3000/auth/reset-password',
+  email = 'jalenparham@gmail.com',
 }: Props) => {
-  const baseUrl = "https://app.saastemplate.com";
+  const baseUrl = 'https://app.saastemplate.com';
   const currentYear = new Date().getFullYear();
 
   return (
@@ -78,7 +78,7 @@ const PasswordResetEmailTemplate = ({
 
             <Section className="rounded-[8px] border-l-[4px] border-l-[#3b82f6] bg-[#f9fafb] p-[16px]">
               <Text className="m-0 text-[14px] leading-[22px] text-[#4b5563]">
-                This link will expire in{" "}
+                This link will expire in{' '}
                 <span className="font-bold">24 hours</span>. If you didn&apos;t
                 request a password reset, please ignore this email or contact
                 support if you have concerns.
@@ -99,7 +99,7 @@ const PasswordResetEmailTemplate = ({
 
             <Section className="border-t border-t-[#e5e7eb]">
               <Text className="text-[14px] leading-[24px] text-[#6b7280]">
-                Need help? Contact our support team at{" "}
+                Need help? Contact our support team at{' '}
                 <a
                   href="mailto:support@saastemplate.com"
                   className="text-[#3b82f6] no-underline"

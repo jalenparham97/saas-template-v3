@@ -12,7 +12,7 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from '@react-email/components';
 
 const APP_NAME = 'SaaS Template';
 
@@ -22,10 +22,10 @@ interface ChangeEmailProps {
 }
 
 const ChangeEmailTemplate = ({
-  email = "bukinoshita@example.com",
-  link = "http://localhost:3000/api/auth/callback/email?callbackUrl=http%3A%2F%2Flocalhost%3A3000&token=3862779cce10af2342b11eb5d5957ceb6797645a41c329c5200f31c2b741a32d&email=jalenparham97%40gmail.com",
+  email = 'bukinoshita@example.com',
+  link = 'http://localhost:3000/api/auth/callback/email?callbackUrl=http%3A%2F%2Flocalhost%3A3000&token=3862779cce10af2342b11eb5d5957ceb6797645a41c329c5200f31c2b741a32d&email=jalenparham97%40gmail.com',
 }: ChangeEmailProps) => {
-  const baseUrl = "https://app.saastemplate.com";
+  const baseUrl = 'https://app.saastemplate.com';
   const currentYear = new Date().getFullYear();
 
   return (
@@ -59,7 +59,7 @@ const ChangeEmailTemplate = ({
                 Hi there,
               </Text>
               <Text className="text-[16px] leading-[26px] text-[#4b5563]">
-                We received a request to change your email address to{" "}
+                We received a request to change your email address to{' '}
                 <span className="font-bold text-[#1f2937]">{email}</span>. To
                 complete the process, please click the button below.
               </Text>
@@ -76,7 +76,7 @@ const ChangeEmailTemplate = ({
 
             <Section className="rounded-[8px] border-l-[4px] border-l-[#3b82f6] bg-[#f9fafb] p-[16px]">
               <Text className="m-0 text-[14px] leading-[22px] text-[#4b5563]">
-                This link will expire in{" "}
+                This link will expire in{' '}
                 <span className="font-bold">24 hours</span>. If you didn&apos;t
                 request this email change, please ignore this email or contact
                 support if you have concerns.
@@ -97,7 +97,7 @@ const ChangeEmailTemplate = ({
 
             <Section className="border-t border-t-[#e5e7eb]">
               <Text className="text-[14px] leading-[24px] text-[#6b7280]">
-                Need help? Contact our support team at{" "}
+                Need help? Contact our support team at{' '}
                 <a
                   href="mailto:support@saastemplate.com"
                   className="text-[#3b82f6] no-underline"

@@ -14,7 +14,7 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from '@react-email/components';
 
 const APP_NAME = 'SaaS Template';
 
@@ -31,17 +31,17 @@ interface RejectedNotificationEmailProps {
 }
 
 export const RejectedNotificationEmailTemplate = ({
-  projectName = "Marketing Campaign Q1",
-  requesterName = "John Doe",
-  approverName = "Sarah Johnson",
-  organizationName = "Acme Inc.",
+  projectName = 'Marketing Campaign Q1',
+  requesterName = 'John Doe',
+  approverName = 'Sarah Johnson',
+  organizationName = 'Acme Inc.',
   reviewComments,
-  startDate = "No date provided",
-  endDate = "No date provided",
+  startDate = 'No date provided',
+  endDate = 'No date provided',
   slideCount = 5,
-  projectLink = "https://app.saastemplate.com/projects/123",
+  projectLink = 'https://app.saastemplate.com/projects/123',
 }: RejectedNotificationEmailProps) => {
-  const baseUrl = "https://app.saastemplate.com";
+  const baseUrl = 'https://app.saastemplate.com';
   const currentYear = new Date().getFullYear();
 
   return (
@@ -65,15 +65,15 @@ export const RejectedNotificationEmailTemplate = ({
             </Heading>
 
             <Text className="mb-[4px] text-[16px] leading-[24px] text-gray-600">
-              Hello{" "}
+              Hello{' '}
               <span className="font-bold text-black">{requesterName}</span>,
             </Text>
 
             <Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-              We reviewed your project{" "}
+              We reviewed your project{' '}
               <span className="font-bold text-black">
                 &quot;{projectName}&quot;
-              </span>{" "}
+              </span>{' '}
               for
               <span className="font-bold text-black"> {organizationName}</span>,
               and it was not approved by
@@ -134,7 +134,7 @@ export const RejectedNotificationEmailTemplate = ({
                   </Column>
                   <Column>
                     <Text className="m-0 text-[14px] text-[#1f2937]">
-                      {slideCount} slide{slideCount !== 1 ? "s" : ""}
+                      {slideCount} slide{slideCount !== 1 ? 's' : ''}
                     </Text>
                   </Column>
                 </Row>

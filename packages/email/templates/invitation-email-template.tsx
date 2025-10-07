@@ -12,7 +12,7 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from '@react-email/components';
 
 const APP_NAME = 'SaaS Template';
 
@@ -24,12 +24,12 @@ interface Props {
 }
 
 const InvitationEmail = ({
-  organizationName = "Acme Inc.",
-  inviterName = "Sarah Johnson",
-  inviteeEmail = "email@example.com",
-  invitationLink = "https://example.com/accept-invitation",
+  organizationName = 'Acme Inc.',
+  inviterName = 'Sarah Johnson',
+  inviteeEmail = 'email@example.com',
+  invitationLink = 'https://example.com/accept-invitation',
 }: Props) => {
-  const baseUrl = "https://app.saastemplate.com";
+  const baseUrl = 'https://app.saastemplate.com';
 
   const currentYear = new Date().getFullYear();
 
@@ -51,16 +51,16 @@ const InvitationEmail = ({
             </Heading>
 
             <Text className="mb-[4px] text-[16px] leading-[24px] text-gray-600">
-              Hello,{" "}
+              Hello,{' '}
               <span className="font-bold text-black">{inviteeEmail}</span>
             </Text>
 
             <Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
               <span className="font-bold text-black">{inviterName}</span> has
-              invited you to collaborate on{" "}
+              invited you to collaborate on{' '}
               <span className="font-bold text-black">
                 {organizationName}&apos;s
-              </span>{" "}
+              </span>{' '}
               workspace. Join now to collaborate on shared projects and more.
             </Text>
 
@@ -75,7 +75,7 @@ const InvitationEmail = ({
 
             <Section className="mb-[24px] rounded-[8px] border-l-[4px] border-l-[#3b82f6] bg-[#f9fafb] p-[16px]">
               <Text className="m-0 text-[14px] leading-[22px] text-[#4b5563]">
-                This invitation will expire in{" "}
+                This invitation will expire in{' '}
                 <span className="font-bold">7 days</span> days. If you have any
                 questions, simply reply to this email.
               </Text>

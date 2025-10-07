@@ -12,7 +12,7 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from '@react-email/components';
 
 const APP_NAME = 'SaaS Template';
 
@@ -25,13 +25,13 @@ interface NewUserEmailProps {
 }
 
 const NewUserEmailTemplate = ({
-  userEmail = "newuser@example.com",
-  adminName = "Admin User",
-  organizationName = "Acme Inc.",
-  setPasswordLink = "https://example.com/set-password",
-  supportEmail = "support@saastemplate.com",
+  userEmail = 'newuser@example.com',
+  adminName = 'Admin User',
+  organizationName = 'Acme Inc.',
+  setPasswordLink = 'https://example.com/set-password',
+  supportEmail = 'support@saastemplate.com',
 }: NewUserEmailProps) => {
-  const baseUrl = "https://app.saastemplate.com";
+  const baseUrl = 'https://app.saastemplate.com';
   const currentYear = new Date().getFullYear();
 
   return (
@@ -58,10 +58,10 @@ const NewUserEmailTemplate = ({
             </Text>
 
             <Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-              Your account was created by{" "}
+              Your account was created by{' '}
               <span className="font-bold text-black">{adminName}</span>.
-              You&apos;re invited to join{" "}
-              <span className="font-bold text-black">{organizationName}</span>{" "}
+              You&apos;re invited to join{' '}
+              <span className="font-bold text-black">{organizationName}</span>{' '}
               on {APP_NAME}.
             </Text>
 
@@ -96,7 +96,7 @@ const NewUserEmailTemplate = ({
 
             <Section className="border-t border-t-[#e5e7eb]">
               <Text className="text-[14px] leading-[24px] text-[#6b7280]">
-                Need help? Contact our support team at{" "}
+                Need help? Contact our support team at{' '}
                 <a
                   href={`mailto:${supportEmail}`}
                   className="text-[#3b82f6] no-underline"
