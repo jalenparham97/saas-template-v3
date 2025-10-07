@@ -1,6 +1,5 @@
 import { env } from '@/env';
 import { APP_ROUTES } from '@/lib/constants';
-import { stripeClient } from '@better-auth/stripe/client';
 import { adminClient, passkeyClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
@@ -9,7 +8,7 @@ export const authClient = createAuthClient({
   plugins: [
     adminClient(),
     passkeyClient(),
-    stripeClient({ subscription: true }),
+    // stripeClient({ subscription: true }),
   ],
 });
 

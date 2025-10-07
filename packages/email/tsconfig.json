@@ -2,7 +2,7 @@
   "extends": "@workspace/typescript-config/react-library.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "types": [], // added: prevent implicit resolution of 'minimatch' from extended config
+    "types": ["node"], // added: prevent implicit resolution of 'minimatch' from extended config
     "paths": {
       "@workspace/react-form/*": ["./src/*"]
     }

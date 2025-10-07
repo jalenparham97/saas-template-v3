@@ -1,4 +1,4 @@
 import { Resend } from 'resend';
-import { keys } from './keys';
+import { env } from './env';
 
-export const resend = new Resend(keys().RESEND_TOKEN);
+export const resend = new Resend(env.RESEND_API_KEY);

@@ -1,11 +1,7 @@
-import { env } from '@/env';
-import { stripeApiClient } from '@/lib/stripe';
-import { stripe } from '@better-auth/stripe';
 import { db } from '@workspace/database';
 import { betterAuth, type AuthContext } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin, openAPI } from 'better-auth/plugins';
-import { passkey } from 'better-auth/plugins/passkey';
 import { headers } from 'next/headers';
 // import {
 //   sendEmailChangeEmail,
@@ -22,29 +18,24 @@ export const auth = betterAuth({
       adminRoles: ['admin', 'superadmin'],
     }),
     openAPI(),
-    passkey({
-      rpName: 'Saas Template',
-      rpID: 'localhost',
-      origin: 'http://localhost:3000',
-    }),
-    stripe({
-      stripeClient: stripeApiClient,
-      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
-      createCustomerOnSignUp: true,
-      subscription: {
-        enabled: true,
-        plans: [
-          {
-            name: 'pro',
-            priceId: 'price_1Pvzd24MSHP8haifCe9PFN73',
-            annualDiscountPriceId: 'price_1R0o164MSHP8haifVv1mksa4',
-            freeTrial: {
-              days: 14,
-            },
-          },
-        ],
-      },
-    }),
+    // stripe({
+    //   stripeClient: stripeApiClient,
+    //   stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+    //   createCustomerOnSignUp: true,
+    //   subscription: {
+    //     enabled: true,
+    //     plans: [
+    //       {
+    //         name: 'pro',
+    //         priceId: 'price_1Pvzd24MSHP8haifCe9PFN73',
+    //         annualDiscountPriceId: 'price_1R0o164MSHP8haifVv1mksa4',
+    //         freeTrial: {
+    //           days: 14,
+    //         },
+    //       },
+    //     ],
+    //   },
+    // }),
   ],
   advanced: {
     database: {
@@ -86,24 +77,24 @@ export const auth = betterAuth({
       enabled: true,
     },
   },
-  emailVerification: {
-    sendOnSignUp: true,
-    autoSignInAfterVerification: true,
-    sendVerificationEmail: async ({ user, url }) => {
-      // await sendVerifyEmail(user.email, url);
-      console.log('Send verify email', user.email, url);
-    },
-  },
-  socialProviders: {
-    google: {
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    },
-    github: {
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-    },
-  },
+  // emailVerification: {
+  //   sendOnSignUp: true,
+  //   autoSignInAfterVerification: true,
+  //   sendVerificationEmail: async ({ user, url }) => {
+  //     // await sendVerifyEmail(user.email, url);
+  //     console.log('Send verify email', user.email, url);
+  //   },
+  // },
+  // socialProviders: {
+  //   google: {
+  //     clientId: env.GOOGLE_CLIENT_ID,
+  //     clientSecret: env.GOOGLE_CLIENT_SECRET,
+  //   },
+  //   github: {
+  //     clientId: env.GITHUB_CLIENT_ID,
+  //     clientSecret: env.GITHUB_CLIENT_SECRET,
+  //   },
+  // },
   account: {
     accountLinking: {
       enabled: true,

@@ -1,17 +1,13 @@
 'use client';
 
 import { createZodForm } from '@workspace/react-form';
-import { Alert, AlertDescription } from '@workspace/ui/components/alert';
-import { Button } from '@workspace/ui/components/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card';
-import { Input, InputWrapper } from '@workspace/ui/components/input';
+  Alert,
+  AlertDescription,
+  AlertIcon,
+} from '@workspace/ui/components/alert';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
 import {
   InputField,
   InputFieldControl,
@@ -66,104 +62,126 @@ export default function ResetPasswordPage() {
   });
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Reset password</CardTitle>
-        <CardDescription>
-          {success
-            ? 'Your password has been reset'
-            : 'Enter your new password below'}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center py-10">
+      <div className="w-full space-y-6">
+        <div className="space-y-1 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Reset password
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {success
+              ? 'Your password has been reset'
+              : 'Enter your new password below'}
+          </p>
+        </div>
         {success ? (
           <Alert variant="success" appearance="light">
-            <CheckCircle2 className="h-4 w-4" />
+            <AlertIcon>
+              <CheckCircle2 className="h-4 w-4" />
+            </AlertIcon>
             <AlertDescription>
               Your password has been successfully reset. You can now sign in
               with your new password.
             </AlertDescription>
           </Alert>
         ) : (
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-5">
             {error && (
               <Alert variant="destructive" appearance="light">
-                <AlertCircle className="h-4 w-4" />
+                <AlertIcon>
+                  <AlertCircle className="h-4 w-4" />
+                </AlertIcon>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-
             <InputField>
               <InputFieldLabel>New Password</InputFieldLabel>
               <InputFieldControl error={!!errors.password}>
-                <InputWrapper>
+                <div className="relative">
                   <Input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
+                    autoComplete="new-password"
                     {...register('password')}
+                    className="pr-10"
                   />
                   <Button
                     type="button"
                     mode="icon"
-                    variant="dim"
+                    variant="ghost"
                     size="sm"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="-me-2"
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
                   >
-                    {showPassword ? <EyeOff /> : <Eye />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
-                </InputWrapper>
+                </div>
               </InputFieldControl>
               <InputFieldError message={errors.password?.message} />
             </InputField>
-
             <InputField>
               <InputFieldLabel>Confirm New Password</InputFieldLabel>
               <InputFieldControl error={!!errors.confirmPassword}>
-                <InputWrapper>
+                <div className="relative">
                   <Input
                     type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
+                    autoComplete="new-password"
                     {...register('confirmPassword')}
+                    className="pr-10"
                   />
                   <Button
                     type="button"
                     mode="icon"
-                    variant="dim"
+                    variant="ghost"
                     size="sm"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="-me-2"
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
+                    aria-label={
+                      showConfirmPassword ? 'Hide password' : 'Show password'
+                    }
                   >
-                    {showConfirmPassword ? <EyeOff /> : <Eye />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
-                </InputWrapper>
+                </div>
               </InputFieldControl>
               <InputFieldError message={errors.confirmPassword?.message} />
             </InputField>
-
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Resetting password...' : 'Reset password'}
             </Button>
           </form>
         )}
-      </CardContent>
-      <CardFooter className="flex flex-col space-y-4">
-        {success ? (
-          <Link
-            href="/login"
-            className="text-sm text-center text-primary hover:underline w-full"
-          >
-            Continue to login
-          </Link>
-        ) : (
-          <div className="text-sm text-center text-muted-foreground">
-            Remember your password?{' '}
-            <Link href="/login" className="text-primary hover:underline">
-              Sign in
+        <div className="pt-2 text-center text-sm text-muted-foreground">
+          {success ? (
+            <Link
+              href="/login"
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Continue to login
             </Link>
-          </div>
-        )}
-      </CardFooter>
-    </Card>
+          ) : (
+            <>
+              Remember your password?{' '}
+              <Link
+                href="/login"
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                Sign in
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

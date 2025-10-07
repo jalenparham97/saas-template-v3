@@ -40,12 +40,12 @@ export const WelcomeEmailTemplate = () => {
         </Preview>
         <Body className="px-2 py-10 font-sans">
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
-            <Img
+            {/* <Img
               src={`${logoBaseUrl}/logo-full-dark.png`}
               alt="SaaS Template Logo"
               width="180"
               className="mx-auto mb-[40px]"
-            />
+            /> */}
 
             <Section className="mt-[8px] mb-[12px] text-center">
               <Heading className="m-0 p-0 text-center text-[22px] font-bold text-[#1f2937] sm:text-[28px]">

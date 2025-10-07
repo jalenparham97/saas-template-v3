@@ -1,17 +1,15 @@
 'use client';
 
+import { authClient } from '@/lib/auth-client';
+import { APP_ROUTES } from '@/lib/constants';
 import { createZodForm } from '@workspace/react-form';
-import { Alert, AlertDescription } from '@workspace/ui/components/alert';
-import { Button } from '@workspace/ui/components/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card';
-import { Input, InputWrapper } from '@workspace/ui/components/input';
+  Alert,
+  AlertDescription,
+  AlertIcon,
+} from '@workspace/ui/components/alert';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
 import {
   InputField,
   InputFieldControl,
@@ -20,6 +18,7 @@ import {
 } from '@workspace/ui/components/input-field';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod/v4';
 
@@ -39,8 +38,9 @@ const [useSignUpForm] = createZodForm(signUpSchema);
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const {
     register,
@@ -48,30 +48,42 @@ export default function SignUpPage() {
     formState: { errors, isSubmitting },
   } = useSignUpForm();
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      setError(null);
-      // TODO: Implement sign-up logic
-      console.log('Sign up data:', data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } catch {
-      setError('An error occurred. Please try again.');
-    }
-  });
+  async function onSubmit(data: z.infer<typeof signUpSchema>) {
+    setError(null);
+    await authClient.signUp.email({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      callbackURL: APP_ROUTES.DASHBOARD,
+      fetchOptions: {
+        onSuccess: () => {
+          router.push(APP_ROUTES.DASHBOARD);
+        },
+        onError: (ctx) => {
+          setError(ctx.error.message);
+        },
+      },
+    });
+  }
 
   return (
-    <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-        <CardDescription>
-          Enter your information to create your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="space-y-4">
+    <div className="mx-auto flex w-full max-w-sm flex-col items-center justify-center py-10">
+      <div className="w-full space-y-6">
+        <div className="space-y-1 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Create an account
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Enter your details below to get started
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {error && (
             <Alert variant="destructive" appearance="light">
-              <AlertCircle className="h-4 w-4" />
+              <AlertIcon>
+                <AlertCircle className="h-4 w-4" />
+              </AlertIcon>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -79,7 +91,7 @@ export default function SignUpPage() {
           <InputField>
             <InputFieldLabel>Name</InputFieldLabel>
             <InputFieldControl error={!!errors.name}>
-              <Input type="text" placeholder="John Doe" {...register('name')} />
+              <Input type="text" {...register('name')} />
             </InputFieldControl>
             <InputFieldError message={errors.name?.message} />
           </InputField>
@@ -87,11 +99,7 @@ export default function SignUpPage() {
           <InputField>
             <InputFieldLabel>Email</InputFieldLabel>
             <InputFieldControl error={!!errors.email}>
-              <Input
-                type="email"
-                placeholder="john@example.com"
-                {...register('email')}
-              />
+              <Input type="email" autoComplete="email" {...register('email')} />
             </InputFieldControl>
             <InputFieldError message={errors.email?.message} />
           </InputField>
@@ -99,23 +107,29 @@ export default function SignUpPage() {
           <InputField>
             <InputFieldLabel>Password</InputFieldLabel>
             <InputFieldControl error={!!errors.password}>
-              <InputWrapper>
+              <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  autoComplete="new-password"
                   {...register('password')}
+                  className="pr-10"
                 />
                 <Button
                   type="button"
                   mode="icon"
-                  variant="dim"
+                  variant="ghost"
                   size="sm"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="-me-2"
+                  className="absolute right-1 top-1/2 -translate-y-1/2"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
-              </InputWrapper>
+              </div>
             </InputFieldControl>
             <InputFieldError message={errors.password?.message} />
           </InputField>
@@ -124,16 +138,17 @@ export default function SignUpPage() {
             {isSubmitting ? 'Creating account...' : 'Create account'}
           </Button>
         </form>
-      </CardContent>
 
-      <CardFooter className="flex flex-col space-y-4">
-        <div className="text-sm text-center text-muted-foreground">
+        <div className="pt-2 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link
+            href="/login"
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
             Sign in
           </Link>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

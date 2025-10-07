@@ -7,7 +7,6 @@ import {
   Heading,
   Hr,
   Html,
-  Img,
   Preview,
   Section,
   Tailwind,
@@ -22,7 +21,7 @@ interface Props {
 }
 
 const PasswordResetEmailTemplate = ({
-  link = 'http://localhost:3000/auth/reset-password',
+  link = 'http://localhost:3000/reset-password',
   email = 'jalenparham@gmail.com',
 }: Props) => {
   const baseUrl = 'https://app.saastemplate.com';
@@ -41,12 +40,12 @@ const PasswordResetEmailTemplate = ({
         <Preview>Reset your password in just one click</Preview>
         <Body className="px-2 py-10 font-sans">
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
-            <Img
+            {/* <Img
               src={`${baseUrl}/logo-full-dark.png`}
               alt="SaaS Template Logo"
               width="180"
               className="mb-[32px]"
-            />
+            /> */}
 
             <Section className="mt-[8px] mb-[20px]">
               <Heading className="m-0 p-0 text-left text-[28px] font-bold text-[#1f2937]">

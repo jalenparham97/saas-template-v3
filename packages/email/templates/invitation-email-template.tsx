@@ -7,7 +7,6 @@ import {
   Heading,
   Hr,
   Html,
-  Img,
   Preview,
   Section,
   Tailwind,
@@ -40,12 +39,12 @@ const InvitationEmail = ({
         <Preview>You&apos;ve been invited to join {organizationName}</Preview>
         <Body className="px-2 py-10 font-sans">
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
-            <Img
+            {/* <Img
               src={`${baseUrl}/logo-full-dark.png`}
               alt="SaaS Template Logo"
               width="180"
               className="mb-[32px]"
-            />
+            /> */}
             <Heading className="m-0 mb-[24px] p-0 text-left text-[28px] font-bold text-[#1f2937]">
               Join {organizationName}
             </Heading>
