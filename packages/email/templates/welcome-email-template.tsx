@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/libs/constants";
+// import { APP_NAME } from '@/libs/constants';
 import {
   Body,
   Button,
@@ -17,15 +17,12 @@ import {
   Text,
 } from "@react-email/components";
 
-interface WelcomeEmailProps {
-  logoImg?: string;
-}
+const APP_NAME = 'SaaS Template';
 
 const baseUrl = "https://www.fireball.email/fireball-assets/";
 
-export const WelcomeEmailTemplate = ({}: WelcomeEmailProps) => {
-  const logoBaseUrl =
-    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://app.slydeshow.com";
+export const WelcomeEmailTemplate = () => {
+  const logoBaseUrl = "https://app.saastemplate.com";
   const currentYear = new Date().getFullYear();
 
   return (
@@ -45,7 +42,7 @@ export const WelcomeEmailTemplate = ({}: WelcomeEmailProps) => {
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
             <Img
               src={`${logoBaseUrl}/logo-full-dark.png`}
-              alt="SlydeShow Logo"
+              alt="SaaS Template Logo"
               width="180"
               className="mx-auto mb-[40px]"
             />
@@ -66,7 +63,7 @@ export const WelcomeEmailTemplate = ({}: WelcomeEmailProps) => {
             <Section className="mt-[24px] mb-[24px] text-center">
               <Button
                 className="box-border w-full rounded-[8px] bg-black px-[24px] py-[14px] text-center font-bold text-white no-underline"
-                href="https://app.formbox.app/organizations"
+                href="https://app.saastemplate.com"
               >
                 Get Started
               </Button>
@@ -99,7 +96,7 @@ export const WelcomeEmailTemplate = ({}: WelcomeEmailProps) => {
                       your first form in no time.
                     </Text>
                     <Link
-                      href="https://docs.formbox.app/introduction"
+                      href="https://docs.saastemplate.com/introduction"
                       className="text-[14px] text-[#3b82f6] no-underline"
                     >
                       Create your first form
@@ -128,7 +125,7 @@ export const WelcomeEmailTemplate = ({}: WelcomeEmailProps) => {
                       you might have.
                     </Text>
                     <Link
-                      href="https://formbox.app/contact"
+                      href="https://saastemplate.com/contact"
                       className="text-[14px] text-[#3b82f6] no-underline"
                     >
                       Help and contact
@@ -157,7 +154,7 @@ export const WelcomeEmailTemplate = ({}: WelcomeEmailProps) => {
                       features and capabilities.
                     </Text>
                     <Link
-                      href="https://docs.formbox.app"
+                      href="https://docs.saastemplate.com"
                       className="text-[14px] text-[#3b82f6] no-underline"
                     >
                       Documentation
@@ -173,10 +170,10 @@ export const WelcomeEmailTemplate = ({}: WelcomeEmailProps) => {
               <Text className="text-[14px] leading-[24px] text-[#6b7280]">
                 Need help? Contact our support team at{" "}
                 <a
-                  href="mailto:support@slydeshow.com"
+                  href="mailto:support@saastemplate.com"
                   className="text-[#3b82f6] no-underline"
                 >
-                  support@slydeshow.com
+                  support@saastemplate.com
                 </a>
               </Text>
             </Section>

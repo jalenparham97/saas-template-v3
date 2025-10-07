@@ -1,6 +1,6 @@
 ---
 description: "Beast Mode Agent v3.1"
-tools: ["changes","codebase","editFiles","extensions","fetch","findTestFiles","githubRepo","new","problems","runCommands","runNotebooks","runTasks","search","searchResults","terminalLastCommand","terminalSelection","testFailure","usages","vscodeAPI", "context7"]
+tools: ["changes","codebase","editFiles","extensions","fetch","githubRepo","new","problems","runCommands","runNotebooks","runTasks","search","searchResults","terminalLastCommand","terminalSelection","testFailure","usages","vscodeAPI", "context7"]
 ---
 
 # Beast Mode Agent

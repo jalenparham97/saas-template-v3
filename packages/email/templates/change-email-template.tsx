@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/libs/constants";
+// import { APP_NAME } from '@/libs/constants';
 import {
   Body,
   Button,
@@ -14,6 +14,8 @@ import {
   Text,
 } from "@react-email/components";
 
+const APP_NAME = 'SaaS Template';
+
 interface ChangeEmailProps {
   email?: string;
   link?: string;
@@ -23,8 +25,7 @@ const ChangeEmailTemplate = ({
   email = "bukinoshita@example.com",
   link = "http://localhost:3000/api/auth/callback/email?callbackUrl=http%3A%2F%2Flocalhost%3A3000&token=3862779cce10af2342b11eb5d5957ceb6797645a41c329c5200f31c2b741a32d&email=jalenparham97%40gmail.com",
 }: ChangeEmailProps) => {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://app.slydeshow.com";
+  const baseUrl = "https://app.saastemplate.com";
   const currentYear = new Date().getFullYear();
 
   return (
@@ -42,7 +43,7 @@ const ChangeEmailTemplate = ({
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
             <Img
               src={`${baseUrl}/logo-full-dark.png`}
-              alt="SlydeShow Logo"
+              alt="SaaS Template Logo"
               width="180"
               className="mb-[32px]"
             />
@@ -98,10 +99,10 @@ const ChangeEmailTemplate = ({
               <Text className="text-[14px] leading-[24px] text-[#6b7280]">
                 Need help? Contact our support team at{" "}
                 <a
-                  href="mailto:support@slydeshow.com"
+                  href="mailto:support@saastemplate.com"
                   className="text-[#3b82f6] no-underline"
                 >
-                  support@slydeshow.com
+                  support@saastemplate.com
                 </a>
               </Text>
             </Section>

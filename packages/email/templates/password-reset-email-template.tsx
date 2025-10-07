@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/libs/constants";
+// import { APP_NAME } from '@/libs/constants';
 import {
   Body,
   Button,
@@ -14,6 +14,8 @@ import {
   Text,
 } from "@react-email/components";
 
+const APP_NAME = 'SaaS Template';
+
 interface Props {
   link?: string;
   email?: string;
@@ -23,8 +25,7 @@ const PasswordResetEmailTemplate = ({
   link = "http://localhost:3000/auth/reset-password",
   email = "jalenparham@gmail.com",
 }: Props) => {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://app.slydeshow.com";
+  const baseUrl = "https://app.saastemplate.com";
   const currentYear = new Date().getFullYear();
 
   return (
@@ -42,7 +43,7 @@ const PasswordResetEmailTemplate = ({
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
             <Img
               src={`${baseUrl}/logo-full-dark.png`}
-              alt="SlydeShow Logo"
+              alt="SaaS Template Logo"
               width="180"
               className="mb-[32px]"
             />
@@ -100,10 +101,10 @@ const PasswordResetEmailTemplate = ({
               <Text className="text-[14px] leading-[24px] text-[#6b7280]">
                 Need help? Contact our support team at{" "}
                 <a
-                  href="mailto:support@slydeshow.com"
+                  href="mailto:support@saastemplate.com"
                   className="text-[#3b82f6] no-underline"
                 >
-                  support@slydeshow.com
+                  support@saastemplate.com
                 </a>
               </Text>
             </Section>

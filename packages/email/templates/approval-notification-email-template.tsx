@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/libs/constants";
+// import { APP_NAME } from '@/libs/constants';
 import {
   Body,
   Button,
@@ -14,33 +14,34 @@ import {
   Section,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from '@react-email/components';
 
-interface RejectedNotificationEmailProps {
+const APP_NAME = 'SaaS Template';
+
+interface ApprovalNotificationEmailProps {
   projectName: string;
   requesterName: string;
-  approverName: string;
+  requesterEmail: string;
   organizationName: string;
-  reviewComments?: string;
+  comments?: string;
   startDate?: string;
   endDate?: string;
   slideCount?: number;
-  projectLink: string;
+  approvalLink: string;
 }
 
-export const RejectedNotificationEmailTemplate = ({
-  projectName = "Marketing Campaign Q1",
-  requesterName = "John Doe",
-  approverName = "Sarah Johnson",
-  organizationName = "Acme Inc.",
-  reviewComments,
-  startDate = "No date provided",
-  endDate = "No date provided",
+export const ApprovalNotificationEmailTemplate = ({
+  projectName = 'Marketing Campaign Q1',
+  requesterName = 'John Doe',
+  requesterEmail = 'john@example.com',
+  organizationName = 'Acme Inc.',
+  comments,
+  startDate,
+  endDate,
   slideCount = 5,
-  projectLink = "https://app.slydeshow.com/projects/123",
-}: RejectedNotificationEmailProps) => {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://app.slydeshow.com";
+  approvalLink = 'https://app.saastemplate.com/approvals',
+}: ApprovalNotificationEmailProps) => {
+  const baseUrl = 'https://app.saastemplate.com';
   const currentYear = new Date().getFullYear();
 
   return (
@@ -48,7 +49,7 @@ export const RejectedNotificationEmailTemplate = ({
       <Html>
         <Head />
         <Preview>
-          Update: your project &quot;{projectName}&quot; was not approved
+          New project approval request: {projectName} by {requesterName}
         </Preview>
         <Body className="px-2 py-10 font-sans">
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
@@ -60,33 +61,19 @@ export const RejectedNotificationEmailTemplate = ({
             />
 
             <Heading className="m-0 mb-[24px] p-0 text-left text-[28px] font-bold text-[#1f2937]">
-              ❌ Project Not Approved
+              Project Approval Request
             </Heading>
 
             <Text className="mb-[4px] text-[16px] leading-[24px] text-gray-600">
-              Hello{" "}
-              <span className="font-bold text-black">{requesterName}</span>,
+              Hello,
             </Text>
 
             <Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-              We reviewed your project{" "}
-              <span className="font-bold text-black">
-                &quot;{projectName}&quot;
-              </span>{" "}
-              for
-              <span className="font-bold text-black"> {organizationName}</span>,
-              and it was not approved by
-              <span className="font-bold text-black"> {approverName}</span>.
+              <span className="font-bold text-black">{requesterName}</span> (
+              <span className="text-[#3b82f6]">{requesterEmail}</span>) has
+              submitted a new project for approval in{' '}
+              <span className="font-bold text-black">{organizationName}</span>.
             </Text>
-
-            {/* Rejection Banner */}
-            <Section className="mb-[32px] rounded-[8px] border-l-[4px] border-l-[#ef4444] bg-[#fff1f2] p-[16px]">
-              <Text className="m-0 text-[14px] leading-[22px] text-[#7f1d1d]">
-                <span className="font-bold">Next steps:</span> Review the
-                comments below, make the requested changes, and resubmit the
-                project for approval when ready.
-              </Text>
-            </Section>
 
             {/* Project Details Section */}
             <Section className="mb-[32px] rounded-[8px] border border-gray-200 bg-[#f9fafb] p-[24px]">
@@ -113,27 +100,12 @@ export const RejectedNotificationEmailTemplate = ({
                 <Row>
                   <Column className="w-[120px] align-top">
                     <Text className="m-0 text-[14px] font-bold text-[#374151]">
-                      Status:
-                    </Text>
-                  </Column>
-                  <Column>
-                    <Text className="m-0 text-[14px] font-bold text-[#ef4444]">
-                      ❌ REJECTED
-                    </Text>
-                  </Column>
-                </Row>
-              </div>
-
-              <div className="mb-[16px]">
-                <Row>
-                  <Column className="w-[120px] align-top">
-                    <Text className="m-0 text-[14px] font-bold text-[#374151]">
                       Slides:
                     </Text>
                   </Column>
                   <Column>
                     <Text className="m-0 text-[14px] text-[#1f2937]">
-                      {slideCount} slide{slideCount !== 1 ? "s" : ""}
+                      {slideCount} slide{slideCount !== 1 ? 's' : ''}
                     </Text>
                   </Column>
                 </Row>
@@ -169,28 +141,13 @@ export const RejectedNotificationEmailTemplate = ({
                 </Row>
               </div>
 
-              <div className="mb-[16px]">
-                <Row>
-                  <Column className="w-[120px] align-top">
-                    <Text className="m-0 text-[14px] font-bold text-[#374151]">
-                      Reviewed by:
-                    </Text>
-                  </Column>
-                  <Column>
-                    <Text className="m-0 text-[14px] text-[#1f2937]">
-                      {approverName}
-                    </Text>
-                  </Column>
-                </Row>
-              </div>
-
-              {reviewComments && (
+              {comments && (
                 <div>
                   <Text className="mb-[8px] text-[14px] font-bold text-[#374151]">
-                    Reviewer comments:
+                    Comments from requester:
                   </Text>
                   <Text className="m-0 text-[14px] leading-[20px] text-[#1f2937]">
-                    {reviewComments}
+                    {comments}
                   </Text>
                 </div>
               )}
@@ -200,23 +157,31 @@ export const RejectedNotificationEmailTemplate = ({
             <Section className="mb-[32px] text-center">
               <Button
                 className="box-border rounded-[8px] bg-black px-[24px] py-[14px] text-center font-bold text-white no-underline"
-                href={projectLink}
+                href={approvalLink}
               >
-                View Project
+                Review Request
               </Button>
             </Section>
 
+            {/* Info Box */}
+            <Section className="mb-[24px] rounded-[8px] border-l-[4px] border-l-[#3b82f6] bg-[#f9fafb] p-[16px]">
+              <Text className="m-0 text-[14px] leading-[22px] text-[#4b5563]">
+                <span className="font-bold">Action Required:</span> This project
+                is waiting for your approval. Please review the project details
+                and either approve or reject the submission.
+              </Text>
+            </Section>
+
             <Text className="mb-[32px] text-[16px] leading-[24px] text-gray-600">
-              If you have questions about this decision or need help updating
-              your project, please contact your organization administrators.
+              Thank you for your attention to this approval request.
             </Text>
 
             <Hr className="my-[24px] border-gray-200" />
 
             <Text className="text-[14px] leading-[20px] text-gray-500">
-              If you believe this decision was made in error, you may resubmit
-              after making updates or reach out to the approver for
-              clarification.
+              This email was sent because you have admin permissions in{' '}
+              {organizationName}. If you have any questions about this approval
+              request, please contact the requester directly.
             </Text>
 
             <Hr className="my-[24px] border-gray-200" />
@@ -233,4 +198,4 @@ export const RejectedNotificationEmailTemplate = ({
   );
 };
 
-export default RejectedNotificationEmailTemplate;
+export default ApprovalNotificationEmailTemplate;

@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/libs/constants";
+// import { APP_NAME } from '@/libs/constants';
 import {
   Body,
   Button,
@@ -14,6 +14,8 @@ import {
   Text,
 } from "@react-email/components";
 
+const APP_NAME = 'SaaS Template';
+
 interface Props {
   organizationName: string;
   inviterName: string;
@@ -27,8 +29,7 @@ const InvitationEmail = ({
   inviteeEmail = "email@example.com",
   invitationLink = "https://example.com/accept-invitation",
 }: Props) => {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://app.slydeshow.com";
+  const baseUrl = "https://app.saastemplate.com";
 
   const currentYear = new Date().getFullYear();
 
@@ -41,7 +42,7 @@ const InvitationEmail = ({
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
             <Img
               src={`${baseUrl}/logo-full-dark.png`}
-              alt="SlydeShow Logo"
+              alt="SaaS Template Logo"
               width="180"
               className="mb-[32px]"
             />

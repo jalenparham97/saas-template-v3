@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/libs/constants";
+// import { APP_NAME } from '@/libs/constants';
 import {
   Body,
   Button,
@@ -14,6 +14,8 @@ import {
   Text,
 } from "@react-email/components";
 
+const APP_NAME = 'SaaS Template';
+
 interface NewUserEmailProps {
   userEmail: string;
   adminName: string;
@@ -27,10 +29,9 @@ const NewUserEmailTemplate = ({
   adminName = "Admin User",
   organizationName = "Acme Inc.",
   setPasswordLink = "https://example.com/set-password",
-  supportEmail = "support@example.com",
+  supportEmail = "support@saastemplate.com",
 }: NewUserEmailProps) => {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_BASE_URL || "https://app.slydeshow.com";
+  const baseUrl = "https://app.saastemplate.com";
   const currentYear = new Date().getFullYear();
 
   return (
@@ -44,7 +45,7 @@ const NewUserEmailTemplate = ({
           <Container className="max-w-[600px] bg-white p-[24px] sm:p-[48px]">
             <Img
               src={`${baseUrl}/logo-full-dark.png`}
-              alt="SlydeShow Logo"
+              alt="SaaS Template Logo"
               width="180"
               className="mb-[32px]"
             />
