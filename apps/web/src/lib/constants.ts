@@ -19,7 +19,12 @@ export const publicRoutes = ['/api/webhooks/stripe'];
  * An array of routes that are used for authentication
  * These routes will redirect logged in users to /dashboard
  */
-export const authRoutes = ['/login', '/signup'];
+export const authRoutes = [
+  '/login',
+  '/signup',
+  '/forgot-password',
+  '/reset-password',
+];
 
 /**
  * The prefix for API authentication routes

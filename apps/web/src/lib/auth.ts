@@ -1,3 +1,6 @@
+import { env } from '@/env';
+import { stripeApiClient } from '@/lib/stripe';
+import { stripe } from '@better-auth/stripe';
 import { db } from '@workspace/database';
 import { betterAuth, type AuthContext } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
@@ -18,24 +21,24 @@ export const auth = betterAuth({
       adminRoles: ['admin', 'superadmin'],
     }),
     openAPI(),
-    // stripe({
-    //   stripeClient: stripeApiClient,
-    //   stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
-    //   createCustomerOnSignUp: true,
-    //   subscription: {
-    //     enabled: true,
-    //     plans: [
-    //       {
-    //         name: 'pro',
-    //         priceId: 'price_1Pvzd24MSHP8haifCe9PFN73',
-    //         annualDiscountPriceId: 'price_1R0o164MSHP8haifVv1mksa4',
-    //         freeTrial: {
-    //           days: 14,
-    //         },
-    //       },
-    //     ],
-    //   },
-    // }),
+    stripe({
+      stripeClient: stripeApiClient,
+      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+      createCustomerOnSignUp: true,
+      subscription: {
+        enabled: true,
+        plans: [
+          {
+            name: 'pro',
+            priceId: 'price_1Pvzd24MSHP8haifCe9PFN73',
+            annualDiscountPriceId: 'price_1R0o164MSHP8haifVv1mksa4',
+            freeTrial: {
+              days: 14,
+            },
+          },
+        ],
+      },
+    }),
   ],
   advanced: {
     database: {

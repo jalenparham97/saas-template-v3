@@ -91,7 +91,7 @@ function InputFieldLabel({
   const { id } = useInputFieldContext();
 
   return (
-    <Label htmlFor={id} className={cn('block mb-2', className)} {...props}>
+    <Label htmlFor={id} className={cn('block mb-3', className)} {...props}>
       {children}
       {required && <span className="text-destructive ml-1">*</span>}
     </Label>

@@ -1,8 +1,11 @@
 'use client';
 
+import { env } from '@/env';
 import { authClient } from '@/lib/auth-client';
 import { APP_ROUTES } from '@/lib/constants';
-import { createZodForm } from '@workspace/react-form';
+import { nanoid } from '@/lib/nanoid';
+import { useUserUpdateMutation } from '@/queries/user.queries';
+import { useZodForm } from '@workspace/react-form';
 import {
   Alert,
   AlertDescription,
@@ -16,11 +19,41 @@ import {
   InputFieldError,
   InputFieldLabel,
 } from '@workspace/ui/components/input-field';
+import type { User } from 'better-auth';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod/v4';
+
+/**
+ * Asynchronously generates an avatar image for a user by sending a POST request to the avatar API.
+ *
+ * @param seed - A string used to seed the avatar generation process.
+ * @param uniqueIdentifier - The unique identifier of the user for whom the avatar is being generated.
+ * @returns A promise that resolves to the URL of the generated avatar image.
+ * @throws Will throw an error if the upload fails or the response is not OK.
+ */
+export const createAvatarImage = async (
+  seed: string,
+  uniqueIdentifier: string
+) => {
+  const res = await fetch(`${env.NEXT_PUBLIC_APP_BASE_URL}/api/upload/avatar`, {
+    method: 'POST',
+    body: JSON.stringify({
+      seed,
+      key: `users/${uniqueIdentifier}/${nanoid(10)}.svg`,
+    }),
+  });
+  // Check if the upload was successful
+  if (!res.ok) {
+    throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+  }
+  // // Get the image URL from the response
+  const response = await res.json();
+  // Return the image URL
+  return response.url as string;
+};
 
 const signUpSchema = z.object({
   name: z.string().min(2, { error: 'Name must be at least 2 characters' }),
@@ -34,8 +67,6 @@ const signUpSchema = z.object({
     }),
 });
 
-const [useSignUpForm] = createZodForm(signUpSchema);
-
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +77,9 @@ export default function SignUpPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useSignUpForm();
+  } = useZodForm({ schema: signUpSchema });
+
+  const updateUserMutation = useUserUpdateMutation();
 
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
     setError(null);
@@ -56,7 +89,14 @@ export default function SignUpPage() {
       password: data.password,
       callbackURL: APP_ROUTES.DASHBOARD,
       fetchOptions: {
-        onSuccess: () => {
+        onSuccess: async (ctx) => {
+          const user = ctx.data.user as User;
+          // Generate the user image
+          const userImage = await createAvatarImage(data.name, user.id);
+          // Update the user image in the database
+          await updateUserMutation.mutateAsync({
+            image: userImage,
+          });
           router.push(APP_ROUTES.DASHBOARD);
         },
         onError: (ctx) => {
