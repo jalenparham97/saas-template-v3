@@ -1,4 +1,11 @@
+'use client';
+
 import { SettingsSection } from '@/features/settings/components/settings-section';
+import {
+  useNotificationPreferencesQuery,
+  useUpdateNotificationPreferencesMutation,
+} from '@/features/settings/queries/notifications.queries';
+import { Controller, useZodForm } from '@workspace/react-form';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -11,8 +18,50 @@ import {
 import { Label } from '@workspace/ui/components/label';
 import { Separator } from '@workspace/ui/components/separator';
 import { Switch } from '@workspace/ui/components/switch';
+import { useEffect } from 'react';
+import { z } from 'zod/v4';
+
+const NotificationPreferencesSchema = z.object({
+  accountUpdates: z.boolean(),
+  productUpdates: z.boolean(),
+  marketingEmails: z.boolean(),
+});
+
+type NotificationPreferencesFormData = z.infer<
+  typeof NotificationPreferencesSchema
+>;
 
 export function NotificationsSettings() {
+  const { data: preferences } = useNotificationPreferencesQuery();
+
+  const updateMutation = useUpdateNotificationPreferencesMutation();
+
+  const form = useZodForm({
+    schema: NotificationPreferencesSchema,
+    defaultValues: {
+      accountUpdates: true,
+      productUpdates: false,
+      marketingEmails: false,
+    },
+  });
+
+  // Update form values when preferences are loaded
+  useEffect(() => {
+    if (preferences) {
+      form.reset({
+        accountUpdates: preferences.accountUpdates,
+        productUpdates: preferences.productUpdates,
+        marketingEmails: preferences.marketingEmails,
+      });
+    }
+  }, [preferences, form]);
+
+  const handleSave = async (data: NotificationPreferencesFormData) => {
+    await updateMutation.mutateAsync(data);
+  };
+
+  const isDirty = form.formState.isDirty;
+
   return (
     <div className="space-y-10">
       <SettingsSection>
@@ -39,7 +88,17 @@ export function NotificationsSettings() {
                   Receive emails about your account activity and security.
                 </p>
               </div>
-              <Switch defaultChecked />
+              <Controller
+                name="accountUpdates"
+                control={form.control}
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={updateMutation.isPending}
+                  />
+                )}
+              />
             </div>
             <div className="flex items-center justify-between space-x-2">
               <div className="flex-1 space-y-1">
@@ -48,7 +107,17 @@ export function NotificationsSettings() {
                   Get notified about new features and product updates.
                 </p>
               </div>
-              <Switch defaultChecked />
+              <Controller
+                name="productUpdates"
+                control={form.control}
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={updateMutation.isPending}
+                  />
+                )}
+              />
             </div>
             <div className="flex items-center justify-between space-x-2">
               <div className="flex-1 space-y-1">
@@ -57,11 +126,27 @@ export function NotificationsSettings() {
                   Receive promotional emails and special offers.
                 </p>
               </div>
-              <Switch />
+              <Controller
+                name="marketingEmails"
+                control={form.control}
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={updateMutation.isPending}
+                  />
+                )}
+              />
             </div>
           </CardContent>
           <CardFooter className="py-4">
-            <Button>Save Preferences</Button>
+            <Button
+              onClick={form.handleSubmit(handleSave)}
+              disabled={!isDirty || updateMutation.isPending}
+              loading={updateMutation.isPending}
+            >
+              Save preferences
+            </Button>
           </CardFooter>
         </Card>
       </SettingsSection>
@@ -92,7 +177,7 @@ export function NotificationsSettings() {
                   Show notifications on your desktop.
                 </p>
               </div>
-              <Switch />
+              <Switch disabled />
             </div>
             <div className="flex items-center justify-between space-x-2">
               <div className="flex-1 space-y-1">
@@ -101,11 +186,11 @@ export function NotificationsSettings() {
                   Receive push notifications on your mobile device.
                 </p>
               </div>
-              <Switch />
+              <Switch disabled />
             </div>
           </CardContent>
-          <CardFooter className="py-4">
-            <Button>Save Preferences</Button>
+          <CardFooter className="text-sm text-muted-foreground">
+            Push notifications coming soon.
           </CardFooter>
         </Card>
       </SettingsSection>

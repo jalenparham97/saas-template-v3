@@ -8,6 +8,7 @@ import {
 import { APP_ROUTES } from '@/lib/constants';
 import { api } from '@/trpc/react';
 import { useMutation } from '@tanstack/react-query';
+import { useToast } from '@workspace/ui/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 // import { toast } from 'sonner';
 
@@ -24,24 +25,27 @@ export function useUserCurrentSession() {
 }
 
 export const useUserUpdateMutation = (options?: QueryOptions) => {
+  const toast = useToast();
   const apiUtils = api.useUtils();
 
   return api.user.updateUser.useMutation({
     onSuccess: () => {
-      // if (options?.showToast) {
-      //   toast.success('Account updated', {
-      //     description: 'Your account has been successfully updated!',
-      //     closeButton: true,
-      //   });
-      // }
-      console.log('Account updated');
+      if (options?.showToast) {
+        toast.add({
+          title: 'Account updated',
+          description: 'Your account has been successfully updated!',
+          data: { close: true },
+        });
+      }
     },
     onError: (error, _, ctx) => {
       console.log(error);
-      // toast.error('Something went wrong!', {
-      //   description: 'An error occured while trying to update your profile.',
-      //   closeButton: true,
-      // });
+      toast.add({
+        title: 'Something went wrong!',
+        description: 'An error occured while trying to update your profile.',
+        data: { close: true },
+        type: 'error',
+      });
     },
     onSettled: async () => {
       await apiUtils.user.getUser.invalidate();
@@ -50,40 +54,31 @@ export const useUserUpdateMutation = (options?: QueryOptions) => {
 };
 
 export function useUserDeleteAccountMutation() {
-  const router = useRouter();
+  const toast = useToast();
 
-  return api.user.deleteAccount.useMutation({
-    onSuccess: async () => {
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            router.push(APP_ROUTES.LOGIN);
-          },
-        },
+  return useMutation({
+    mutationFn: async () => {
+      await authClient.deleteUser({
+        callbackURL: APP_ROUTES.LOGIN,
+      });
+    },
+    onSuccess: () => {
+      toast.add({
+        title: 'Account deleted',
+        description: 'Your account has been successfully deleted.',
+        data: { close: true },
       });
     },
     onError: (error) => {
       console.log(error);
-      // toast.error('Something went wrong!', {
-      //   description: error.message,
-      //   closeButton: true,
-      // });
+      toast.add({
+        title: 'Something went wrong!',
+        description: 'An error occurred while trying to delete your account.',
+        data: { close: true },
+        type: 'error',
+      });
     },
   });
-
-  // return useMutation({
-  //   mutationFn: async () => await authClient.deleteUser(),
-  //   onSuccess: () => {
-  //     router.push(APP_ROUTES.SIGN_UP);
-  //   },
-  //   onError: (error) => {
-  //     console.log(error);
-  //     toast.error("Something went wrong!", {
-  //       description: error.message,
-  //       closeButton: true,
-  //     });
-  //   },
-  // });
 }
 
 export function useRevokeAllUserSessionsMutation() {

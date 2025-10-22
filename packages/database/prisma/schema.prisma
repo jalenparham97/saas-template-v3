@@ -15,24 +15,38 @@ datasource db {
 }
 
 model User {
-  id               String    @id @default(cuid(2))
-  name             String
-  email            String
-  emailVerified    Boolean
-  image            String?
-  role             String?
-  banned           Boolean?
-  banReason        String?
-  banExpires       DateTime?
-  stripeCustomerId String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  sessions         Session[]
-  accounts         Account[]
-  passkeys         Passkey[]
+  id                      String                       @id @default(cuid(2))
+  name                    String
+  email                   String
+  emailVerified           Boolean
+  image                   String?
+  role                    String?
+  banned                  Boolean?
+  banReason               String?
+  banExpires              DateTime?
+  stripeCustomerId        String?
+  createdAt               DateTime                     @default(now())
+  updatedAt               DateTime                     @updatedAt
+  sessions                Session[]
+  accounts                Account[]
+  passkeys                Passkey[]
+  notificationPreferences UserNotificationPreferences?
 
   @@unique([email])
   @@map("user")
+}
+
+model UserNotificationPreferences {
+  id              String   @id @default(cuid(2))
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountUpdates  Boolean  @default(true)
+  productUpdates  Boolean  @default(false)
+  marketingEmails Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("user_notification_preferences")
 }
 
 model Subscription {

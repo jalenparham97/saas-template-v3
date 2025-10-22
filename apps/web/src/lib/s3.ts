@@ -9,6 +9,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { tigris } from 'better-upload/server/helpers';
 
 /**
  * Configured S3 client instance for interacting with Tigris Data
@@ -21,6 +22,12 @@ export const s3Client = new S3Client({
     accessKeyId: env.S3_ACCESS_KEY_ID,
     secretAccessKey: env.S3_SECRET_ACCESS_KEY,
   },
+});
+
+export const tigrisClient = tigris({
+  accessKeyId: env.S3_ACCESS_KEY_ID,
+  secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+  endpoint: env.S3_ENDPOINT_URL,
 });
 
 /**

@@ -11,6 +11,9 @@ import {
 } from 'react-hook-form';
 import type * as z from 'zod/v4';
 
+// Re-export commonly used react-hook-form components
+export { Controller } from 'react-hook-form';
+
 type ZodSchema = z.ZodType<FieldValues>;
 
 export const createZodForm = <TSchema extends ZodSchema>(schema: TSchema) => {

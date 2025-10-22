@@ -29,14 +29,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from '@workspace/ui/components/sidebar';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export function NavUser() {
-  const { isMobile } = useSidebar();
   const router = useRouter();
 
   const user = useUser();
@@ -77,7 +75,7 @@ export function NavUser() {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? 'bottom' : 'right'}
+            side={'bottom'}
             align="end"
             sideOffset={4}
           >

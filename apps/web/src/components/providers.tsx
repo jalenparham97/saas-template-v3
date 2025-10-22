@@ -1,6 +1,7 @@
 'use client';
 
 import { TRPCReactProvider } from '@/trpc/react';
+import { ToastProvider } from '@workspace/ui/components/base-toast';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import * as React from 'react';
 
@@ -13,7 +14,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
       enableColorScheme
     >
-      <TRPCReactProvider>{children}</TRPCReactProvider>
+      <ToastProvider>
+        <TRPCReactProvider>{children}</TRPCReactProvider>
+      </ToastProvider>
     </NextThemesProvider>
   );
 }

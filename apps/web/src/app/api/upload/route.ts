@@ -1,6 +1,6 @@
 import { env } from '@/env';
 import { auth } from '@/lib/auth';
-import { s3Client } from '@/lib/s3';
+import { tigrisClient } from '@/lib/s3';
 import { IMAGE_MIME_TYPE } from '@/types/utility.types';
 import {
   createUploadRouteHandler,
@@ -21,7 +21,7 @@ async function checkAuthSession(headers: Headers) {
 }
 
 export const { POST } = createUploadRouteHandler({
-  client: s3Client,
+  client: tigrisClient,
   bucketName: env.S3_BUCKET_NAME,
   routes: {
     accountLogoUpload: route({

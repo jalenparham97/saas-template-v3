@@ -1,4 +1,13 @@
+'use client';
+
+import { DeleteDialog } from '@/components/delete-dialog';
 import { SettingsSection } from '@/features/settings/components/settings-section';
+import {
+  useUser,
+  useUserDeleteAccountMutation,
+  useUserUpdateMutation,
+} from '@/queries/user.queries';
+import { useZodForm } from '@workspace/react-form';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -12,11 +21,53 @@ import { Input } from '@workspace/ui/components/input';
 import {
   InputField,
   InputFieldControl,
+  InputFieldError,
   InputFieldLabel,
 } from '@workspace/ui/components/input-field';
 import { Separator } from '@workspace/ui/components/separator';
+import { useDialog } from '@workspace/ui/hooks/use-dialog';
+import { Loader2Icon } from 'lucide-react';
+import { useEffect } from 'react';
+import z from 'zod';
+
+const userSchema = z.object({
+  name: z.string().min(1, { error: 'Please enter your name' }).trim(),
+});
 
 export function GeneralSettings() {
+  const [isDeleteOpen, deleteDialogHandlers] = useDialog();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useZodForm({
+    schema: userSchema,
+  });
+
+  const user = useUser();
+
+  useEffect(() => {
+    if (user?.data) {
+      setValue('name', user.data.name);
+    }
+  }, [user?.data]);
+
+  const updateUserMutation = useUserUpdateMutation({ showToast: true });
+  const deleteAccountMutation = useUserDeleteAccountMutation();
+
+  const onSubmit = async (data: z.infer<typeof userSchema>) => {
+    updateUserMutation.mutateAsync({
+      name: data.name ?? user?.data?.name,
+    });
+  };
+
+  const handleDeleteAccount = async () => {
+    await deleteAccountMutation.mutateAsync();
+    deleteDialogHandlers.close();
+  };
+
   return (
     <div className="space-y-10">
       <SettingsSection>
@@ -37,21 +88,30 @@ export function GeneralSettings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
-            <InputField>
+            <InputField className="max-w-lg">
               <InputFieldLabel>Full Name</InputFieldLabel>
-              <InputFieldControl>
-                <Input />
+              <InputFieldControl error={!!errors.name}>
+                <Input defaultValue={user?.data?.name} {...register('name')} />
               </InputFieldControl>
+              <InputFieldError message={errors.name?.message} />
             </InputField>
-            <InputField>
+            <InputField className="max-w-lg">
               <InputFieldLabel>Email</InputFieldLabel>
               <InputFieldControl>
-                <Input type="email" />
+                <Input type="email" defaultValue={user?.data?.email} disabled />
               </InputFieldControl>
             </InputField>
           </CardContent>
           <CardFooter className="py-4">
-            <Button>Save Changes</Button>
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              disabled={updateUserMutation.isPending}
+            >
+              {updateUserMutation.isPending && (
+                <Loader2Icon className="animate-spin size-4" />
+              )}
+              Save changes
+            </Button>
           </CardFooter>
         </Card>
       </SettingsSection>
@@ -85,7 +145,22 @@ export function GeneralSettings() {
             </CardDescription>
           </CardContent>
           <CardFooter className="py-4">
-            <Button variant="destructive">Delete my account</Button>
+            <DeleteDialog
+              open={isDeleteOpen}
+              onOpenChange={(open) =>
+                open
+                  ? deleteDialogHandlers.open()
+                  : deleteDialogHandlers.close()
+              }
+              loading={deleteAccountMutation.isPending}
+              onDelete={handleDeleteAccount}
+              trigger={<Button variant="destructive">Delete my account</Button>}
+              title="Delete your account?"
+              description="Permanently delete your account and all associated data. We will also cancel any associated subscriptions. This action cannot be undone."
+              confirmationText="Delete my account"
+              confirmationInputLabel="Type 'Delete my account' to confirm"
+              deleteButtonText="Delete account"
+            />
           </CardFooter>
         </Card>
       </SettingsSection>
