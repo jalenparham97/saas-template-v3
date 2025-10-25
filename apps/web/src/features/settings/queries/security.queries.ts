@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/features/auth/queries/auth.queries';
 import { authClient } from '@/lib/auth-client';
 import { ChangePasswordSchema } from '@/schemas/auth.schemas';
 import { useMutation } from '@tanstack/react-query';
@@ -42,17 +43,12 @@ export const useChangePasswordMutation = () => {
  * Useful for security - signs out the user from all active sessions
  */
 export const useSignOutAllDevicesMutation = () => {
+  const { signout } = useAuth();
+
   return useMutation({
     mutationFn: async () => {
-      // Revoke all sessions by signing out and invalidating sessions
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            // Redirect to login after sign out
-            window.location.href = '/auth/sign-in';
-          },
-        },
-      });
+      // Sign out from all sessions
+      await signout();
     },
     onError: (error) => {
       console.error('Sign out failed:', error);

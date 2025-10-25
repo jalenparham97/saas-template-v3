@@ -1,12 +1,12 @@
 'use client';
 
 import { DeleteDialog } from '@/components/delete-dialog';
-import { SettingsSection } from '@/features/settings/components/settings-section';
 import {
-  useUser,
+  useAuth,
   useUserDeleteAccountMutation,
   useUserUpdateMutation,
-} from '@/queries/user.queries';
+} from '@/features/auth/queries/auth.queries';
+import { SettingsSection } from '@/features/settings/components/settings-section';
 import { useZodForm } from '@workspace/react-form';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -36,6 +36,7 @@ const userSchema = z.object({
 
 export function GeneralSettings() {
   const [isDeleteOpen, deleteDialogHandlers] = useDialog();
+  const { user } = useAuth();
 
   const {
     register,
@@ -46,13 +47,11 @@ export function GeneralSettings() {
     schema: userSchema,
   });
 
-  const user = useUser();
-
   useEffect(() => {
     if (user?.data) {
       setValue('name', user.data.name);
     }
-  }, [user?.data]);
+  }, [user?.data, setValue]);
 
   const updateUserMutation = useUserUpdateMutation({ showToast: true });
   const deleteAccountMutation = useUserDeleteAccountMutation();
