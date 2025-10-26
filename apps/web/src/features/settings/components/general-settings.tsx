@@ -1,13 +1,20 @@
 'use client';
 
 import { DeleteDialog } from '@/components/delete-dialog';
+import { env } from '@/env';
 import {
   useAuth,
   useUserDeleteAccountMutation,
   useUserUpdateMutation,
 } from '@/features/auth/queries/auth.queries';
 import { SettingsSection } from '@/features/settings/components/settings-section';
+import { compressImage } from '@/utils/compress-image';
 import { useZodForm } from '@workspace/react-form';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@workspace/ui/components/avatar';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -25,8 +32,10 @@ import {
   InputFieldLabel,
 } from '@workspace/ui/components/input-field';
 import { Separator } from '@workspace/ui/components/separator';
+import { UploadButton } from '@workspace/ui/components/upload-button';
 import { useDialog } from '@workspace/ui/hooks/use-dialog';
-import { Loader2Icon } from 'lucide-react';
+import { useUploadFiles } from 'better-upload/client';
+import { ImageIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import z from 'zod';
 
@@ -36,13 +45,18 @@ const userSchema = z.object({
 
 export function GeneralSettings() {
   const [isDeleteOpen, deleteDialogHandlers] = useDialog();
+
+  const { control, uploadAsync, uploadedFiles } = useUploadFiles({
+    route: 'accountLogoUpload',
+  });
+
   const { user } = useAuth();
 
   const {
     register,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useZodForm({
     schema: userSchema,
   });
@@ -54,11 +68,21 @@ export function GeneralSettings() {
   }, [user?.data, setValue]);
 
   const updateUserMutation = useUserUpdateMutation({ showToast: true });
+  const updateUserImageMutation = useUserUpdateMutation({ showToast: true });
   const deleteAccountMutation = useUserDeleteAccountMutation();
 
   const onSubmit = async (data: z.infer<typeof userSchema>) => {
     updateUserMutation.mutateAsync({
       name: data.name ?? user?.data?.name,
+    });
+  };
+
+  const handleImageUpload = async (file: File) => {
+    const compressedFile = await compressImage(file);
+    const result = await uploadAsync([compressedFile]);
+    console.log('Uploaded files:', result);
+    await updateUserImageMutation.mutateAsync({
+      image: `${env.NEXT_PUBLIC_S3_PUBLIC_BUCKET_URL}/${result.files[0]?.objectKey}`,
     });
   };
 
@@ -86,9 +110,30 @@ export function GeneralSettings() {
               Update your personal information and profile details.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 pt-6">
+          <CardContent className="space-y-6 pt-6">
+            <div className="col-span-full flex items-center gap-x-8">
+              <Avatar className="h-24 w-24 flex-none rounded-lg object-cover">
+                <AvatarImage src={user?.data?.image ?? ''} />
+                <AvatarFallback className="rounded-full bg-gray-200 uppercase">
+                  <ImageIcon size={30} />
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <UploadButton
+                  variant="outline"
+                  control={control as any}
+                  accept="image/jpeg, image/png, image/webp"
+                  buttonText="Change photo"
+                  uploadOverride={handleImageUpload}
+                />
+
+                <p className="mt-2 text-xs leading-5 text-gray-400">
+                  JPG, PNG, or WEBP. 1MB max.
+                </p>
+              </div>
+            </div>
             <InputField className="max-w-lg">
-              <InputFieldLabel>Full Name</InputFieldLabel>
+              <InputFieldLabel>Full name</InputFieldLabel>
               <InputFieldControl error={!!errors.name}>
                 <Input defaultValue={user?.data?.name} {...register('name')} />
               </InputFieldControl>
@@ -104,11 +149,8 @@ export function GeneralSettings() {
           <CardFooter className="py-4">
             <Button
               onClick={handleSubmit(onSubmit)}
-              disabled={updateUserMutation.isPending}
+              loading={updateUserMutation.isPending}
             >
-              {updateUserMutation.isPending && (
-                <Loader2Icon className="animate-spin size-4" />
-              )}
               Save changes
             </Button>
           </CardFooter>

@@ -1,6 +1,7 @@
 'use client';
 
-import { authClient } from '@/lib/auth-client';
+import GoogleIconSvg from '@/components/icons/google-icon.svg';
+import { authClient, signInWithProvider } from '@/lib/auth-client';
 import { APP_ROUTES } from '@/lib/constants';
 import { createZodForm } from '@workspace/react-form';
 import {
@@ -17,6 +18,7 @@ import {
   InputFieldLabel,
 } from '@workspace/ui/components/input-field';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -32,6 +34,7 @@ const [useLoginForm] = createZodForm(loginSchema);
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const router = useRouter();
 
@@ -56,6 +59,18 @@ export function LoginForm() {
         },
       },
     });
+  }
+
+  async function handleGoogleLogin() {
+    setIsGoogleLoading(true);
+    try {
+      await signInWithProvider('google');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to login with Google'
+      );
+      setIsGoogleLoading(false);
+    }
   }
 
   return (
@@ -121,6 +136,32 @@ export function LoginForm() {
 
         <Button type="submit" className="w-full" loading={isSubmitting}>
           Login
+        </Button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-muted-foreground/20" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleGoogleLogin}
+          disabled={isGoogleLoading}
+        >
+          <Image
+            alt="Sign in with Google"
+            src={GoogleIconSvg}
+            className="size-4"
+          />
+          Google
         </Button>
       </form>
       <div className="pt-2 text-center text-sm text-muted-foreground">

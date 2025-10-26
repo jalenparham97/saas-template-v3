@@ -18,6 +18,7 @@
     "hooks": "@workspace/ui/hooks"
   },
   "registries": {
-    "@reui": "https://reui.io/r/{name}.json"
+    "@reui": "https://reui.io/r/{name}.json",
+    "@better-upload": "https://better-upload.com/r/{name}.json"
   }
 }

@@ -88,20 +88,16 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 90, // Session expires in 90 days
   },
-  // socialProviders: {
-  //   google: {
-  //     clientId: env.GOOGLE_CLIENT_ID,
-  //     clientSecret: env.GOOGLE_CLIENT_SECRET,
-  //   },
-  //   github: {
-  //     clientId: env.GITHUB_CLIENT_ID,
-  //     clientSecret: env.GITHUB_CLIENT_SECRET,
-  //   },
-  // },
+  socialProviders: {
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    },
+  },
   account: {
     accountLinking: {
       enabled: true,
-      trustedProviders: ['google', 'github', 'email-password', 'microsoft'],
+      trustedProviders: ['google', 'email-password'],
     },
   },
 });
