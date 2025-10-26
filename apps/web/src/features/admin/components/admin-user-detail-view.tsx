@@ -507,9 +507,9 @@ export function AdminUserDetailView({ id }: { id: string }) {
               <Button
                 type="submit"
                 variant="destructive"
-                disabled={banSubmitting || banUser.isPending}
+                loading={banUser.isPending}
               >
-                {banSubmitting || banUser.isPending ? 'Banning...' : 'Ban User'}
+                Ban user
               </Button>
             </DialogFooter>
           </form>
