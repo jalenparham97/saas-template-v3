@@ -10,11 +10,13 @@ import {
   useAdminUserQuery,
   useBanUserMutation,
   useDeleteUserMutation,
+  useImpersonateUserMutation,
   useRevokeUserSessionsMutation,
   useUnbanUserMutation,
   useUpdateUserRoleMutation,
 } from '@/features/admin/queries/admin.queries';
 import { formatDate } from '@/utils/format-date';
+import { useZodForm } from '@workspace/react-form';
 import {
   Avatar,
   AvatarFallback,
@@ -37,6 +39,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog';
+import {
+  InputField,
+  InputFieldControl,
+  InputFieldDescription,
+  InputFieldError,
+  InputFieldLabel,
+} from '@workspace/ui/components/input-field';
 import { Label } from '@workspace/ui/components/label';
 import { Separator } from '@workspace/ui/components/separator';
 import { Skeleton } from '@workspace/ui/components/skeleton';
@@ -63,21 +72,34 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { z } from 'zod/v4';
+
+const banSchema = z.object({
+  reason: z.string().min(1, 'Reason is required'),
+});
 
 export function AdminUserDetailView({ id }: { id: string }) {
   const router = useRouter();
-  const { data: user, isLoading } = useAdminUserQuery(id);
 
   const [banDialogOpen, banDialog] = useDialog();
-  const [banReason, setBanReason] = useState('');
   const [roleDialogOpen, roleDialog] = useDialog();
   const [selectedRole, setSelectedRole] = useState<string>('');
+
+  const {
+    register: banRegister,
+    handleSubmit: handleBanSubmit,
+    formState: { errors: banErrors, isSubmitting: banSubmitting },
+    reset: resetBanForm,
+  } = useZodForm({ schema: banSchema, defaultValues: { reason: '' } });
+
+  const { data: user, isLoading } = useAdminUserQuery(id);
 
   const banUser = useBanUserMutation(id);
   const unbanUser = useUnbanUserMutation(id);
   const updateRole = useUpdateUserRoleMutation(id);
   const revokeAllSessions = useRevokeUserSessionsMutation(id);
   const deleteUser = useDeleteUserMutation();
+  const impersonate = useImpersonateUserMutation(id);
 
   if (isLoading) {
     return (
@@ -347,6 +369,36 @@ export function AdminUserDetailView({ id }: { id: string }) {
                     Change Role
                   </Button>
 
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => impersonate.mutate()}
+                    disabled={impersonate.isPending}
+                  >
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    {impersonate.isPending
+                      ? 'Impersonating...'
+                      : 'Impersonate User'}
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() =>
+                      revokeAllSessions.mutate({ userId: user.id })
+                    }
+                    disabled={
+                      revokeAllSessions.isPending || user.sessions.length === 0
+                    }
+                  >
+                    <LogOutIcon className="mr-2 h-4 w-4" />
+                    Revoke All Sessions
+                  </Button>
+                </div>
+
+                <Separator className="my-4" />
+
+                <div className="space-y-2">
                   {user.banned ? (
                     <Button
                       variant="outline"
@@ -368,43 +420,27 @@ export function AdminUserDetailView({ id }: { id: string }) {
                     </Button>
                   )}
 
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() =>
-                      revokeAllSessions.mutate({ userId: user.id })
+                  <DeleteDialog
+                    title="Delete User"
+                    description={`Are you sure you want to delete ${user.name}? This action cannot be undone and will permanently delete their account and all associated data.`}
+                    onDelete={() =>
+                      deleteUser.mutate(
+                        { userId: user.id },
+                        { onSuccess: () => router.push('/admin/users') }
+                      )
                     }
-                    disabled={
-                      revokeAllSessions.isPending || user.sessions.length === 0
+                    loading={deleteUser.isPending}
+                    trigger={
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-destructive"
+                      >
+                        <Trash2Icon className="mr-2 h-4 w-4" />
+                        Delete User
+                      </Button>
                     }
-                  >
-                    <LogOutIcon className="mr-2 h-4 w-4" />
-                    Revoke All Sessions
-                  </Button>
+                  />
                 </div>
-
-                <Separator className="my-4" />
-
-                <DeleteDialog
-                  title="Delete User"
-                  description={`Are you sure you want to delete ${user.name}? This action cannot be undone and will permanently delete their account and all associated data.`}
-                  onDelete={() =>
-                    deleteUser.mutate(
-                      { userId: user.id },
-                      { onSuccess: () => router.push('/admin/users') }
-                    )
-                  }
-                  loading={deleteUser.isPending}
-                  trigger={
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-destructive"
-                    >
-                      <Trash2Icon className="mr-2 h-4 w-4" />
-                      Delete User
-                    </Button>
-                  }
-                />
               </CardContent>
             </Card>
           </div>
@@ -423,46 +459,60 @@ export function AdminUserDetailView({ id }: { id: string }) {
               This will prevent {user.name} from accessing the platform.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="reason">Reason *</Label>
-              <Textarea
-                id="reason"
-                placeholder="Enter the reason for banning this user..."
-                value={banReason}
-                onChange={(e) => setBanReason(e.target.value)}
-                rows={4}
-              />
+          <form
+            onSubmit={handleBanSubmit((data) =>
+              banUser.mutate(
+                { userId: user.id, reason: data.reason },
+                {
+                  onSuccess: () => {
+                    banDialog.close();
+                    resetBanForm();
+                  },
+                }
+              )
+            )}
+          >
+            <div className="space-y-4">
+              <InputField>
+                <InputFieldLabel required>Reason</InputFieldLabel>
+                <InputFieldControl error={!!banErrors.reason}>
+                  <Textarea
+                    placeholder="Enter the reason for banning this user..."
+                    rows={4}
+                    {...banRegister('reason')}
+                  />
+                </InputFieldControl>
+                <InputFieldDescription>
+                  Provide a clear, specific reason. This note is visible to
+                  admins.
+                </InputFieldDescription>
+                {banErrors.reason && (
+                  <InputFieldError
+                    message={banErrors.reason.message as string}
+                  />
+                )}
+              </InputField>
             </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                banDialog.close();
-                setBanReason('');
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() =>
-                banUser.mutate(
-                  { userId: user.id, reason: banReason },
-                  {
-                    onSuccess: () => {
-                      banDialog.close();
-                      setBanReason('');
-                    },
-                  }
-                )
-              }
-              disabled={!banReason || banUser.isPending}
-            >
-              Ban User
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  banDialog.close();
+                  resetBanForm();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={banSubmitting || banUser.isPending}
+              >
+                {banSubmitting || banUser.isPending ? 'Banning...' : 'Ban User'}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

@@ -6,6 +6,7 @@ import {
   PageWrapper,
 } from '@/components/page-structure';
 import { useAdminUsersQuery } from '@/features/admin/queries/admin.queries';
+import { useDebouncedState } from '@/hooks/use-debounced-state';
 import { formatDate } from '@/utils/format-date';
 import {
   ColumnDef,
@@ -31,7 +32,7 @@ import { DataGridTable } from '@workspace/ui/components/data-grid-table';
 import { Input, InputWrapper } from '@workspace/ui/components/input';
 import { SearchIcon, UserIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type AdminUser = {
   id: string;
@@ -53,7 +54,8 @@ const ALLOWED_SORT_COLUMNS = new Set([
 ]);
 
 export function AdminUsersView() {
-  const [search, setSearch] = useState('');
+  // Debounced value used for both input and querying
+  const [search, setSearch] = useDebouncedState('', 500);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -85,6 +87,11 @@ export function AdminUsersView() {
     sortBy,
     sortOrder,
   });
+
+  // Reset to first page when the debounced search term changes
+  useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }, [search]);
 
   const columns = useMemo<ColumnDef<AdminUser>[]>(
     () => [
@@ -263,11 +270,8 @@ export function AdminUsersView() {
           <SearchIcon className="size-4 text-muted-foreground" />
           <Input
             placeholder="Search users..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPagination((p) => ({ ...p, pageIndex: 0 }));
-            }}
+            defaultValue={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
           />
         </InputWrapper>
 

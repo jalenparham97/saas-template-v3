@@ -6,8 +6,10 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  UserXIcon,
 } from 'lucide-react';
 
+import { useStopImpersonatingMutation } from '@/features/admin/queries/admin.queries';
 import { useAuth } from '@/features/auth/queries/auth.queries';
 import { APP_ROUTES } from '@/lib/constants';
 import {
@@ -33,7 +35,9 @@ import { Skeleton } from '@workspace/ui/components/skeleton';
 import Link from 'next/link';
 
 export function NavUser() {
-  const { signout, user } = useAuth();
+  const { signout, user, session } = useAuth();
+
+  const stopImpersonatinMutation = useStopImpersonatingMutation();
 
   if (user?.isLoading || !user?.data) {
     return <Skeleton className="h-[32px] w-auto bg-sidebar-accent" />;
@@ -89,6 +93,18 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+              {session?.data?.impersonatedBy ? (
+                <DropdownMenuItem
+                  onClick={async () =>
+                    await stopImpersonatinMutation.mutateAsync()
+                  }
+                >
+                  <UserXIcon />
+                  Stop impersonating
+                </DropdownMenuItem>
+              ) : (
+                <></>
+              )}
               <Link href={APP_ROUTES.SETTINGS}>
                 <DropdownMenuItem>
                   <BadgeCheck />
