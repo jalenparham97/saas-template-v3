@@ -1,8 +1,6 @@
-import { ShieldIcon, type LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import * as React from 'react';
 
-import { useAuth } from '@/features/auth/queries/auth.queries';
-import { isAdmin } from '@/lib/auth-client';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -12,7 +10,7 @@ import {
 } from '@workspace/ui/components/sidebar';
 import Link from 'next/link';
 
-export function NavSecondary({
+export function AdminNavSecondary({
   items,
   ...props
 }: {
@@ -22,8 +20,6 @@ export function NavSecondary({
     icon: LucideIcon;
   }[];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
-  const { user } = useAuth();
-
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
@@ -31,23 +27,13 @@ export function NavSecondary({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
+                <Link href={item.url}>
                   <item.icon />
                   <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-          {isAdmin(user?.data?.role) && (
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild size="sm">
-                <Link href="/admin">
-                  <ShieldIcon />
-                  <span>Admin</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          )}
+          ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

@@ -1,3 +1,4 @@
+import { adminRouter } from '@/server/api/routers/admin.router';
 import { notificationsRouter } from '@/server/api/routers/notifications.router';
 import { paymentsRouter } from '@/server/api/routers/payments.router';
 import { storageRouter } from '@/server/api/routers/storage.router';
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
   storage: storageRouter,
   payments: paymentsRouter,
   notifications: notificationsRouter,
+  admin: adminRouter,
 });
 
 // export type definition of API

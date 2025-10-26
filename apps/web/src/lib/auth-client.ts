@@ -13,6 +13,10 @@ export const authClient = createAuthClient({
   ],
 });
 
+export const isAdmin = (role?: string | null) => {
+  return role === 'admin' || role === 'superadmin';
+};
+
 /**
  * Supported authentication providers
  */

@@ -6,6 +6,10 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "preview-email": "turbo email#dev",
+    "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate",
+    "db:deploy": "turbo db:deploy",
+    "db:studio": "turbo db:studio",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
