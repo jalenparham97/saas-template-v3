@@ -56,6 +56,7 @@ export const adminRouter = createTRPCRouter({
             OR: [
               { name: { contains: search, mode: 'insensitive' as const } },
               { email: { contains: search, mode: 'insensitive' as const } },
+              { id: { equals: search, mode: 'insensitive' as const } },
             ],
           }
         : {};
