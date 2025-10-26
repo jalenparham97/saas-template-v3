@@ -1,4 +1,5 @@
 import { env } from '@/env';
+import { sendEmailChangeEmail, sendPasswordResetEmail } from '@/lib/mail';
 import { stripeApiClient } from '@/lib/stripe';
 import { stripe } from '@better-auth/stripe';
 import { db } from '@workspace/database';
@@ -6,11 +7,6 @@ import { betterAuth, type AuthContext } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin, openAPI } from 'better-auth/plugins';
 import { headers } from 'next/headers';
-// import {
-//   sendEmailChangeEmail,
-//   sendPasswordResetEmail,
-//   sendVerifyEmail,
-// } from '@/lib/mail';
 
 export const auth = betterAuth({
   database: prismaAdapter(db, {
@@ -60,20 +56,19 @@ export const auth = betterAuth({
       console.info('Auth API error', errorContext);
     },
   },
-
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
-      // await sendPasswordResetEmail(user.email, url);
       console.log('Send password reset email', user.email, url);
+      await sendPasswordResetEmail(user.email, url);
     },
   },
   user: {
     changeEmail: {
       enabled: true,
       sendChangeEmailVerification: async ({ user, newEmail, url }) => {
-        // await sendEmailChangeEmail(user.email, newEmail, url);
         console.log('Send email change email', user.email, newEmail, url);
+        await sendEmailChangeEmail(user.email, newEmail, url);
       },
     },
     deleteUser: {

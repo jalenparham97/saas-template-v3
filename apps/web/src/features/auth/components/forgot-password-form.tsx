@@ -1,6 +1,7 @@
 'use client';
 
-import { createZodForm } from '@workspace/react-form';
+import { useUserPasswordResetMutation } from '@/features/auth/queries/auth.queries';
+import { useZodForm } from '@workspace/react-form';
 import {
   Alert,
   AlertDescription,
@@ -23,8 +24,6 @@ const forgotPasswordSchema = z.object({
   email: z.email({ error: 'Please enter a valid email address' }),
 });
 
-const [useForgotPasswordForm] = createZodForm(forgotPasswordSchema);
-
 export function ForgotPasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -33,23 +32,25 @@ export function ForgotPasswordForm() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForgotPasswordForm();
+  } = useZodForm({ schema: forgotPasswordSchema });
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      setError(null);
-      // TODO: Implement forgot password logic
-      console.log('Forgot password data:', data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  const passwordResetMutation = useUserPasswordResetMutation({
+    onSuccess: () => {
       setSuccess(true);
-    } catch {
-      setError('An error occurred. Please try again.');
-    }
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
   });
+
+  async function onSubmit({ email }: z.infer<typeof forgotPasswordSchema>) {
+    setError(null);
+    await passwordResetMutation.mutateAsync({ email });
+  }
 
   return (
     <div className="w-full space-y-6">
-      <div className="space-y-1 text-center">
+      <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           Forgot password?
         </h1>
@@ -70,7 +71,7 @@ export function ForgotPasswordForm() {
           </AlertDescription>
         </Alert>
       ) : (
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {error && (
             <Alert variant="destructive" appearance="light">
               <AlertIcon>

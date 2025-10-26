@@ -1,4 +1,8 @@
+import { render } from '@react-email/components';
 import { Resend } from 'resend';
+
 import { env } from './env';
 
-export const resend = new Resend(env.RESEND_API_KEY);
+const resend = new Resend(env.RESEND_API_KEY);
+
+export { render, resend };

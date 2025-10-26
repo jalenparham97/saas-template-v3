@@ -80,7 +80,7 @@ export function SignUpForm() {
 
   return (
     <div className="w-full space-y-6">
-      <div className="space-y-1 text-center">
+      <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           Create an account
         </h1>
@@ -128,16 +128,16 @@ export function SignUpForm() {
               <Button
                 type="button"
                 mode="icon"
-                variant="ghost"
+                variant="dim"
                 size="sm"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-1 top-1/2 -translate-y-1/2"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOff className="size-4" />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <Eye className="size-4" />
                 )}
               </Button>
             </div>

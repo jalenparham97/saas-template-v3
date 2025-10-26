@@ -1,6 +1,7 @@
 'use client';
 
-import { createZodForm } from '@workspace/react-form';
+import { authClient } from '@/lib/auth-client';
+import { useZodForm } from '@workspace/react-form';
 import {
   Alert,
   AlertDescription,
@@ -16,6 +17,7 @@ import {
 } from '@workspace/ui/components/input-field';
 import { AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod/v4';
 
@@ -35,42 +37,49 @@ const resetPasswordSchema = z
     path: ['confirmPassword'],
   });
 
-const [useResetPasswordForm] = createZodForm(resetPasswordSchema);
-
 export function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const searchParams = useSearchParams();
+
+  const token = searchParams.get('token') || '';
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
-  } = useResetPasswordForm();
+  } = useZodForm({ schema: resetPasswordSchema });
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      setError(null);
-      // TODO: Implement reset password logic
-      console.log('Reset password data:', data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSuccess(true);
-    } catch {
-      setError('An error occurred. Please try again.');
-    }
-  });
+  const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
+    setError(null);
+    await authClient.resetPassword({
+      newPassword: data.password,
+      token,
+      fetchOptions: {
+        onSuccess: () => {
+          reset({ password: '', confirmPassword: '' });
+          setSuccess(true);
+        },
+        onError: (ctx) => {
+          setError(ctx.error.message ?? 'Something went wrong');
+        },
+      },
+    });
+  };
 
   return (
     <div className="w-full space-y-6">
-      <div className="space-y-1 text-center">
+      <div className="space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           Reset password
         </h1>
         <p className="text-sm text-muted-foreground">
           {success
-            ? 'Your password has been reset'
-            : 'Enter your new password below'}
+            ? 'Your password has been successfully reset'
+            : 'Enter your new password below to complete the reset process. Ensure its strong and secure.'}
         </p>
       </div>
       {success ? (
@@ -84,7 +93,7 @@ export function ResetPasswordForm() {
           </AlertDescription>
         </Alert>
       ) : (
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {error && (
             <Alert variant="destructive" appearance="light">
               <AlertIcon>
@@ -106,7 +115,7 @@ export function ResetPasswordForm() {
                 <Button
                   type="button"
                   mode="icon"
-                  variant="ghost"
+                  variant="dim"
                   size="sm"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-1 top-1/2 -translate-y-1/2"
@@ -135,7 +144,7 @@ export function ResetPasswordForm() {
                 <Button
                   type="button"
                   mode="icon"
-                  variant="ghost"
+                  variant="dim"
                   size="sm"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-1 top-1/2 -translate-y-1/2"
@@ -160,12 +169,9 @@ export function ResetPasswordForm() {
       )}
       <div className="pt-2 text-center text-sm text-muted-foreground">
         {success ? (
-          <Link
-            href="/login"
-            className="font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Continue to login
-          </Link>
+          <Button variant="secondary" asChild>
+            <Link href="/login">Continue to login</Link>
+          </Button>
         ) : (
           <>
             Remember your password?{' '}
