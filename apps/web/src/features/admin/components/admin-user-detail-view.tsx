@@ -289,7 +289,7 @@ export function AdminUserDetailView({ id }: { id: string }) {
                         </Badge>
                       ) : user.emailVerified ? (
                         <Badge variant="success" appearance="outline">
-                          <CheckCircle2Icon className="mr-1 h-3 w-3" />
+                          <CheckCircle2Icon className="size-3" />
                           Verified
                         </Badge>
                       ) : (
@@ -675,7 +675,7 @@ export function AdminUserDetailView({ id }: { id: string }) {
                 selectedRole === user.role
               }
             >
-              Update Role
+              Update role
             </Button>
           </DialogFooter>
         </DialogContent>
