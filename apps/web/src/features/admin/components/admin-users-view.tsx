@@ -8,37 +8,243 @@ import {
 import { useAdminUsersQuery } from '@/features/admin/queries/admin.queries';
 import { formatDate } from '@/utils/format-date';
 import {
+  ColumnDef,
+  PaginationState,
+  SortingState,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from '@workspace/ui/components/avatar';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
-import { Input } from '@workspace/ui/components/input';
-import { Skeleton } from '@workspace/ui/components/skeleton';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@workspace/ui/components/table';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  SearchIcon,
-  UserIcon,
-} from 'lucide-react';
+  DataGrid,
+  DataGridContainer,
+} from '@workspace/ui/components/data-grid';
+import { DataGridColumnHeader } from '@workspace/ui/components/data-grid-column-header';
+import { DataGridPagination } from '@workspace/ui/components/data-grid-pagination';
+import { DataGridTable } from '@workspace/ui/components/data-grid-table';
+import { Input, InputWrapper } from '@workspace/ui/components/input';
+import { SearchIcon, UserIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
+type AdminUser = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  emailVerified: boolean | null;
+  image: string | null;
+  role: 'user' | 'admin' | 'superadmin' | null;
+  banned: boolean | null;
+  createdAt: string | Date;
+  _count: { sessions: number };
+};
+
+const ALLOWED_SORT_COLUMNS = new Set([
+  'name',
+  'email',
+  'createdAt',
+  'updatedAt',
+]);
 
 export function AdminUsersView() {
-  const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const limit = 20;
 
-  const { data, isLoading } = useAdminUsersQuery({ page, limit, search });
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
+  });
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: 'createdAt', desc: true },
+  ]);
+
+  const sortBy = useMemo(() => {
+    const s = sorting?.[0];
+    return s && ALLOWED_SORT_COLUMNS.has(s.id)
+      ? (s.id as 'name' | 'email' | 'createdAt' | 'updatedAt')
+      : 'createdAt';
+  }, [sorting]);
+
+  const sortOrder = useMemo(
+    () => (sorting?.[0]?.desc ? 'desc' : 'asc') as 'asc' | 'desc',
+    [sorting]
+  );
+
+  const page = pagination.pageIndex + 1;
+  const limit = pagination.pageSize;
+
+  const { data, isLoading } = useAdminUsersQuery({
+    page,
+    limit,
+    search,
+    sortBy,
+    sortOrder,
+  });
+
+  const columns = useMemo<ColumnDef<AdminUser>[]>(
+    () => [
+      {
+        accessorKey: 'name',
+        id: 'name',
+        header: ({ column }) => (
+          <DataGridColumnHeader column={column} title="User" />
+        ),
+        enableSorting: true,
+        meta: {
+          headerTitle: 'User',
+          // skeleton: (
+          //   <div className="flex items-center gap-3">
+          //     <Skeleton className="h-10 w-10 rounded-full" />
+          //     <Skeleton className="h-4 w-[150px]" />
+          //   </div>
+          // ),
+        },
+        cell: ({ row }) => {
+          const user = row.original;
+          return (
+            <div className="flex items-center gap-3">
+              <Avatar className="size-8">
+                <AvatarImage src={user.image || undefined} />
+                <AvatarFallback>
+                  {user.name?.charAt(0).toUpperCase() || (
+                    <UserIcon className="size-4" />
+                  )}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <Link
+                  href={`/admin/users/${user.id}`}
+                  className="font-medium hover:text-blue-500 cursor-pointer"
+                >
+                  {user.name}
+                </Link>
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: 'email',
+        id: 'email',
+        header: ({ column }) => (
+          <DataGridColumnHeader column={column} title="Email" />
+        ),
+        enableSorting: true,
+        meta: {
+          headerTitle: 'Email',
+          // skeleton: <Skeleton className="h-4 w-[200px]" />,
+        },
+        cell: ({ row }) => <span>{row.original.email}</span>,
+      },
+      {
+        id: 'status',
+        header: ({ column }) => (
+          <DataGridColumnHeader column={column} title="Status" />
+        ), // sorting disabled
+        enableSorting: false,
+        meta: {
+          headerTitle: 'Status',
+          // skeleton: <Skeleton className="h-5 w-[80px]" />,
+        },
+        cell: ({ row }) => {
+          const user = row.original;
+          return user.banned ? (
+            <Badge variant="destructive" appearance="outline" size="sm">
+              Banned
+            </Badge>
+          ) : user.emailVerified ? (
+            <Badge variant="success" appearance="outline" size="sm">
+              Verified
+            </Badge>
+          ) : (
+            <Badge variant="warning" appearance="outline" size="sm">
+              Unverified
+            </Badge>
+          );
+        },
+      },
+      {
+        accessorKey: 'role',
+        id: 'role',
+        header: ({ column }) => (
+          <DataGridColumnHeader column={column} title="Role" />
+        ), // not server-sortable
+        enableSorting: false,
+        meta: {
+          headerTitle: 'Role',
+          // skeleton: <Skeleton className="h-5 w-[60px]" />,
+        },
+        cell: ({ row }) => {
+          const user = row.original;
+          return (
+            <Badge
+              variant={
+                user.role === 'admin' || user.role === 'superadmin'
+                  ? 'primary'
+                  : 'secondary'
+              }
+              appearance="outline"
+              size="sm"
+            >
+              {user.role || 'user'}
+            </Badge>
+          );
+        },
+      },
+      {
+        accessorKey: 'createdAt',
+        id: 'createdAt',
+        header: ({ column }) => (
+          <DataGridColumnHeader column={column} title="Joined" />
+        ),
+        enableSorting: true,
+        meta: {
+          headerTitle: 'Joined',
+          // skeleton: <Skeleton className="h-4 w-[100px]" />,
+        },
+        cell: ({ row }) => (
+          <span className="text-sm text-muted-foreground">
+            {formatDate(row.original.createdAt)}
+          </span>
+        ),
+      },
+      {
+        id: 'actions',
+        header: ({ column }) => (
+          <DataGridColumnHeader column={column} title="Actions" />
+        ),
+        enableSorting: false,
+        meta: {
+          headerTitle: 'Actions',
+          // skeleton: <Skeleton className="h-9 w-[80px]" />,
+        },
+        cell: ({ row }) => (
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/admin/users/${row.original.id}`}>View</Link>
+          </Button>
+        ),
+      },
+    ],
+    []
+  );
+
+  const table = useReactTable<AdminUser>({
+    data: data?.users as AdminUser[],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    pageCount: data?.totalPages ?? 0,
+    state: { pagination, sorting },
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    manualSorting: true,
+    enableSorting: true,
+  });
 
   return (
     <PageWrapper>
@@ -49,170 +255,43 @@ export function AdminUsersView() {
             Manage all users on the platform
           </p>
         </div>
-        <div className="relative">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center gap-2"></div>
+      </div>
+
+      <PageContent>
+        <InputWrapper className="w-[250px]">
+          <SearchIcon className="size-4 text-muted-foreground" />
           <Input
             placeholder="Search users..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              setPage(1);
+              setPagination((p) => ({ ...p, pageIndex: 0 }));
             }}
-            className="pl-8 w-[250px]"
           />
-        </div>
-      </div>
+        </InputWrapper>
 
-      <PageContent className="mt-0">
-        <div className="rounded-lg border bg-card">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <Skeleton className="h-4 w-[150px]" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-[200px]" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-[80px]" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-[60px]" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-[100px]" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-9 w-[80px]" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : data?.users.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    No users found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data?.users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={user.image || undefined} />
-                          <AvatarFallback>
-                            {user.name?.charAt(0).toUpperCase() || (
-                              <UserIcon className="h-4 w-4" />
-                            )}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{user.name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {user._count.sessions} active session
-                            {user._count.sessions !== 1 ? 's' : ''}
-                          </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <span>{user.email}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {user.banned ? (
-                        <Badge
-                          variant="destructive"
-                          appearance="light"
-                          size="sm"
-                        >
-                          Banned
-                        </Badge>
-                      ) : user.emailVerified ? (
-                        <Badge variant="success" appearance="light" size="sm">
-                          Verified
-                        </Badge>
-                      ) : (
-                        <Badge variant="warning" appearance="light" size="sm">
-                          Unverified
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          user.role === 'admin' || user.role === 'superadmin'
-                            ? 'info'
-                            : 'secondary'
-                        }
-                        appearance="light"
-                        size="sm"
-                      >
-                        {user.role || 'user'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(user.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <Button asChild size="sm" variant="outline">
-                        <Link href={`/admin/users/${user.id}`}>View</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-
-          {data && data.totalPages > 1 && (
-            <div className="flex items-center justify-between border-t px-4 py-3">
-              <div className="text-sm text-muted-foreground">
-                Showing {(page - 1) * limit + 1} to{' '}
-                {Math.min(page * limit, data.total)} of {data.total} users
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage(page - 1)}
-                  disabled={page === 1}
-                >
-                  <ChevronLeftIcon className="h-4 w-4" />
-                  Previous
-                </Button>
-                <div className="text-sm">
-                  Page {page} of {data.totalPages}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage(page + 1)}
-                  disabled={page === data.totalPages}
-                >
-                  Next
-                  <ChevronRightIcon className="h-4 w-4" />
-                </Button>
-              </div>
+        <div className="mt-4">
+          <DataGrid
+            table={table}
+            recordCount={data?.total ?? 0}
+            isLoading={isLoading}
+            tableLayout={{
+              stripped: true,
+              rowRounded: true,
+            }}
+          >
+            <div className="w-full space-y-2.5">
+              <DataGridContainer border={false}>
+                <DataGridTable />
+              </DataGridContainer>
+              <DataGridPagination
+                sizes={[5, 10, 20, 25, 50, 100]}
+                more
+                moreLimit={5}
+              />
             </div>
-          )}
+          </DataGrid>
         </div>
       </PageContent>
     </PageWrapper>

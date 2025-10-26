@@ -2,6 +2,7 @@
 
 import {
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -34,6 +35,7 @@ export function AdminNavMain() {
 
   return (
     <SidebarGroup>
+      <SidebarGroupLabel>Admin Panel</SidebarGroupLabel>
       <SidebarMenu>
         {menuItems.map((item) => (
           <SidebarMenuItem key={item.url}>

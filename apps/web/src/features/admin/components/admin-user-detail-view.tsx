@@ -49,6 +49,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import { Textarea } from '@workspace/ui/components/textarea';
+import { useDialog } from '@workspace/ui/hooks/use-dialog';
 import {
   ArrowLeftIcon,
   BanIcon,
@@ -56,7 +57,7 @@ import {
   KeyIcon,
   LogOutIcon,
   ShieldIcon,
-  TrashIcon,
+  Trash2Icon,
   UserIcon,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -67,9 +68,9 @@ export function AdminUserDetailView({ id }: { id: string }) {
   const router = useRouter();
   const { data: user, isLoading } = useAdminUserQuery(id);
 
-  const [banDialogOpen, setBanDialogOpen] = useState(false);
+  const [banDialogOpen, banDialog] = useDialog();
   const [banReason, setBanReason] = useState('');
-  const [roleDialogOpen, setRoleDialogOpen] = useState(false);
+  const [roleDialogOpen, roleDialog] = useDialog();
   const [selectedRole, setSelectedRole] = useState<string>('');
 
   const banUser = useBanUserMutation(id);
@@ -120,21 +121,15 @@ export function AdminUserDetailView({ id }: { id: string }) {
 
   return (
     <PageWrapper>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/admin/users">
-              <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Back to Users
-            </Link>
-          </Button>
-          <div className="mt-4">
-            <PageTitle>{user.name}</PageTitle>
-            <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
-          </div>
-        </div>
+      <div>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/admin/users">
+            <ArrowLeftIcon className="size-4" />
+            Back to users
+          </Link>
+        </Button>
       </div>
-      <PageContent className="mt-0">
+      <PageContent>
         <div className="grid gap-6 lg:grid-cols-3">
           {/* User Info Card */}
           <div className="lg:col-span-2 space-y-6">
@@ -157,26 +152,26 @@ export function AdminUserDetailView({ id }: { id: string }) {
                     <h3 className="text-lg font-semibold">{user.name}</h3>
                     <div className="flex gap-2">
                       {user.banned ? (
-                        <Badge variant="destructive" appearance="light">
+                        <Badge variant="destructive" appearance="outline">
                           Banned
                         </Badge>
                       ) : user.emailVerified ? (
-                        <Badge variant="success" appearance="light">
+                        <Badge variant="success" appearance="outline">
                           <CheckCircle2Icon className="mr-1 h-3 w-3" />
                           Verified
                         </Badge>
                       ) : (
-                        <Badge variant="warning" appearance="light">
+                        <Badge variant="warning" appearance="outline">
                           Unverified
                         </Badge>
                       )}
                       <Badge
                         variant={
                           user.role === 'admin' || user.role === 'superadmin'
-                            ? 'info'
+                            ? 'primary'
                             : 'secondary'
                         }
-                        appearance="light"
+                        appearance="outline"
                       >
                         {user.role || 'user'}
                       </Badge>
@@ -339,50 +334,54 @@ export function AdminUserDetailView({ id }: { id: string }) {
                 <CardDescription>Manage user account</CardDescription>
               </CardHeader>
               <CardContent className="">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setSelectedRole(user.role || 'user');
-                    setRoleDialogOpen(true);
-                  }}
-                >
-                  <ShieldIcon className="mr-2 h-4 w-4" />
-                  Change Role
-                </Button>
-
-                {user.banned ? (
+                <div className="space-y-2">
                   <Button
                     variant="outline"
                     className="w-full justify-start"
-                    onClick={() => unbanUser.mutate({ userId: user.id })}
-                    disabled={unbanUser.isPending}
+                    onClick={() => {
+                      setSelectedRole(user.role || 'user');
+                      roleDialog.open();
+                    }}
                   >
-                    <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                    Unban User
+                    <ShieldIcon className="mr-2 h-4 w-4" />
+                    Change Role
                   </Button>
-                ) : (
+
+                  {user.banned ? (
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => unbanUser.mutate({ userId: user.id })}
+                      disabled={unbanUser.isPending}
+                    >
+                      <CheckCircle2Icon className="mr-2 h-4 w-4" />
+                      Unban User
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={banDialog.open}
+                    >
+                      <BanIcon className="mr-2 h-4 w-4" />
+                      Ban User
+                    </Button>
+                  )}
+
                   <Button
                     variant="outline"
                     className="w-full justify-start"
-                    onClick={() => setBanDialogOpen(true)}
+                    onClick={() =>
+                      revokeAllSessions.mutate({ userId: user.id })
+                    }
+                    disabled={
+                      revokeAllSessions.isPending || user.sessions.length === 0
+                    }
                   >
-                    <BanIcon className="mr-2 h-4 w-4" />
-                    Ban User
+                    <LogOutIcon className="mr-2 h-4 w-4" />
+                    Revoke All Sessions
                   </Button>
-                )}
-
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => revokeAllSessions.mutate({ userId: user.id })}
-                  disabled={
-                    revokeAllSessions.isPending || user.sessions.length === 0
-                  }
-                >
-                  <LogOutIcon className="mr-2 h-4 w-4" />
-                  Revoke All Sessions
-                </Button>
+                </div>
 
                 <Separator className="my-4" />
 
@@ -399,9 +398,9 @@ export function AdminUserDetailView({ id }: { id: string }) {
                   trigger={
                     <Button
                       variant="outline"
-                      className="w-full justify-start text-destructive hover:text-destructive"
+                      className="w-full justify-start text-destructive"
                     >
-                      <TrashIcon className="mr-2 h-4 w-4" />
+                      <Trash2Icon className="mr-2 h-4 w-4" />
                       Delete User
                     </Button>
                   }
@@ -413,7 +412,10 @@ export function AdminUserDetailView({ id }: { id: string }) {
       </PageContent>
 
       {/* Ban Dialog */}
-      <Dialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
+      <Dialog
+        open={banDialogOpen}
+        onOpenChange={(open) => (open ? banDialog.open() : banDialog.close())}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Ban User</DialogTitle>
@@ -437,7 +439,7 @@ export function AdminUserDetailView({ id }: { id: string }) {
             <Button
               variant="outline"
               onClick={() => {
-                setBanDialogOpen(false);
+                banDialog.close();
                 setBanReason('');
               }}
             >
@@ -450,7 +452,7 @@ export function AdminUserDetailView({ id }: { id: string }) {
                   { userId: user.id, reason: banReason },
                   {
                     onSuccess: () => {
-                      setBanDialogOpen(false);
+                      banDialog.close();
                       setBanReason('');
                     },
                   }
@@ -465,7 +467,10 @@ export function AdminUserDetailView({ id }: { id: string }) {
       </Dialog>
 
       {/* Role Dialog */}
-      <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+      <Dialog
+        open={roleDialogOpen}
+        onOpenChange={(open) => (open ? roleDialog.open() : roleDialog.close())}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change User Role</DialogTitle>
@@ -487,7 +492,7 @@ export function AdminUserDetailView({ id }: { id: string }) {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>
+            <Button variant="outline" onClick={roleDialog.close}>
               Cancel
             </Button>
             <Button
@@ -497,7 +502,7 @@ export function AdminUserDetailView({ id }: { id: string }) {
                     userId: user.id,
                     role: selectedRole as 'user' | 'admin' | 'superadmin',
                   },
-                  { onSuccess: () => setRoleDialogOpen(false) }
+                  { onSuccess: roleDialog.close }
                 )
               }
               disabled={updateRole.isPending || selectedRole === user.role}

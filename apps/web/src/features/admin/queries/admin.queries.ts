@@ -1,15 +1,20 @@
 import { api } from '@/trpc/react';
 import { useToast } from '@workspace/ui/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 export function useAdminUsersQuery(params: {
   page: number;
   limit: number;
   search?: string;
+  sortBy?: 'name' | 'email' | 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
 }) {
   return api.admin.getUsers.useQuery({
     page: params.page,
     limit: params.limit,
     search: params.search || undefined,
+    sortBy: params.sortBy ?? 'createdAt',
+    sortOrder: params.sortOrder ?? 'desc',
   });
 }
 
@@ -23,7 +28,6 @@ export function useBanUserMutation(userId: string) {
   return api.admin.banUser.useMutation({
     onSuccess: () => {
       toast.add({ title: 'User banned successfully', data: { close: true } });
-      utils.admin.getUserById.invalidate({ userId });
     },
     onError: (error) => {
       toast.add({
@@ -32,6 +36,10 @@ export function useBanUserMutation(userId: string) {
         type: 'error',
         data: { close: true },
       });
+    },
+    onSettled: () => {
+      utils.admin.getUsers.invalidate();
+      utils.admin.getUserById.invalidate({ userId });
     },
   });
 }
@@ -42,7 +50,6 @@ export function useUnbanUserMutation(userId: string) {
   return api.admin.unbanUser.useMutation({
     onSuccess: () => {
       toast.add({ title: 'User unbanned successfully', data: { close: true } });
-      utils.admin.getUserById.invalidate({ userId });
     },
     onError: (error) => {
       toast.add({
@@ -51,6 +58,10 @@ export function useUnbanUserMutation(userId: string) {
         type: 'error',
         data: { close: true },
       });
+    },
+    onSettled: () => {
+      utils.admin.getUsers.invalidate();
+      utils.admin.getUserById.invalidate({ userId });
     },
   });
 }
@@ -61,7 +72,6 @@ export function useUpdateUserRoleMutation(userId: string) {
   return api.admin.updateUserRole.useMutation({
     onSuccess: () => {
       toast.add({ title: 'Role updated successfully', data: { close: true } });
-      utils.admin.getUserById.invalidate({ userId });
     },
     onError: (error) => {
       toast.add({
@@ -70,6 +80,9 @@ export function useUpdateUserRoleMutation(userId: string) {
         type: 'error',
         data: { close: true },
       });
+    },
+    onSettled: () => {
+      utils.admin.getUsers.invalidate();
     },
   });
 }
@@ -80,7 +93,6 @@ export function useRevokeUserSessionsMutation(userId: string) {
   return api.admin.revokeUserSessions.useMutation({
     onSuccess: () => {
       toast.add({ title: 'All sessions revoked', data: { close: true } });
-      utils.admin.getUserById.invalidate({ userId });
     },
     onError: (error) => {
       toast.add({
@@ -89,15 +101,22 @@ export function useRevokeUserSessionsMutation(userId: string) {
         type: 'error',
         data: { close: true },
       });
+    },
+    onSettled: () => {
+      utils.admin.getUsers.invalidate();
+      utils.admin.getUserById.invalidate({ userId });
     },
   });
 }
 
 export function useDeleteUserMutation() {
   const toast = useToast();
+  const utils = api.useUtils();
+  const router = useRouter();
   return api.admin.deleteUser.useMutation({
     onSuccess: () => {
       toast.add({ title: 'User deleted successfully', data: { close: true } });
+      router.push('/admin/users');
     },
     onError: (error) => {
       toast.add({
@@ -106,6 +125,9 @@ export function useDeleteUserMutation() {
         type: 'error',
         data: { close: true },
       });
+    },
+    onSettled: () => {
+      utils.admin.getUsers.invalidate();
     },
   });
 }

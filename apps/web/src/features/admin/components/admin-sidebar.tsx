@@ -7,10 +7,9 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
 } from '@workspace/ui/components/sidebar';
-import { LayoutDashboardIcon, ShieldIcon } from 'lucide-react';
+import { LayoutDashboardIcon } from 'lucide-react';
 
 export function AdminSidebar({
   ...props
@@ -21,13 +20,7 @@ export function AdminSidebar({
         <NavUser />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <div className="flex items-center gap-2 px-2 py-1 text-xs font-medium text-muted-foreground">
-            <ShieldIcon className="h-3 w-3" />
-            Admin Panel
-          </div>
-          <AdminNavMain />
-        </SidebarGroup>
+        <AdminNavMain />
       </SidebarContent>
       <SidebarFooter>
         <AdminNavSecondary

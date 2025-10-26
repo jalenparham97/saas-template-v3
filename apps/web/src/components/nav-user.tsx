@@ -36,7 +36,7 @@ export function NavUser() {
   const { signout, user } = useAuth();
 
   if (user?.isLoading || !user?.data) {
-    return <Skeleton className="h-12 w-full bg-sidebar-accent" />;
+    return <Skeleton className="h-[32px] w-auto bg-sidebar-accent" />;
   }
 
   const handleLogout = async () => {

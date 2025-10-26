@@ -6,7 +6,7 @@ interface PageWrapperProps {
 }
 
 export function PageWrapper({ children }: PageWrapperProps) {
-  return <div className="sm:p-6 lg:p-8">{children}</div>;
+  return <div className="p-4 sm:p-6 lg:p-8">{children}</div>;
 }
 
 export function PageTitle({
