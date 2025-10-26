@@ -46,7 +46,7 @@ export function SubscriptionSettings() {
             </div>
           </CardContent>
           <CardFooter className="py-4">
-            <Button>Manage Subscription</Button>
+            <Button>Manage subscription</Button>
           </CardFooter>
         </Card>
       </SettingsSection>
@@ -79,7 +79,7 @@ export function SubscriptionSettings() {
             </CardDescription>
           </CardContent>
           <CardFooter className="py-4">
-            <Button variant="destructive">Cancel Subscription</Button>
+            <Button variant="destructive">Cancel subscription</Button>
           </CardFooter>
         </Card>
       </SettingsSection>

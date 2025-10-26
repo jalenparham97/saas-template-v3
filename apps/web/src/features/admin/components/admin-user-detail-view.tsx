@@ -15,6 +15,7 @@ import {
   useUnbanUserMutation,
   useUpdateUserRoleMutation,
 } from '@/features/admin/queries/admin.queries';
+import { capitalizeFirstLetter } from '@/utils/capitalize-first-letter';
 import { formatDate } from '@/utils/format-date';
 import { useZodForm } from '@workspace/react-form';
 import {
@@ -74,6 +75,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod/v4';
 
+const ROLE_OPTIONS = [
+  { key: 'user', label: 'User' },
+  { key: 'admin', label: 'Admin' },
+];
+
 const banSchema = z.object({
   reason: z.string().min(1, 'Reason is required'),
 });
@@ -105,15 +111,119 @@ export function AdminUserDetailView({ id }: { id: string }) {
     return (
       <PageWrapper>
         <div>
-          <PageTitle>User Details</PageTitle>
-          <p className="text-sm text-muted-foreground mt-1">
-            Loading user information...
-          </p>
+          <Skeleton className="h-8 w-32" />
         </div>
         <PageContent>
-          <div className="space-y-4">
-            <Skeleton className="h-48 w-full" />
-            <Skeleton className="h-64 w-full" />
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Left column */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* User Info Card (skeleton) */}
+              <Card variant="accent">
+                <CardHeader>
+                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="mt-2 h-4 w-64" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-20 w-20 rounded-full" />
+                    <div className="space-y-2 w-full max-w-sm">
+                      <Skeleton className="h-5 w-48" />
+                      <div className="flex gap-2">
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                        <Skeleton className="h-5 w-20 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i}>
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="mt-2 h-4 w-40" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Sessions Card (skeleton) */}
+              <Card variant="accent">
+                <CardHeader>
+                  <Skeleton className="h-6 w-36" />
+                  <Skeleton className="mt-2 h-4 w-32" />
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-lg border">
+                    <div className="grid grid-cols-4 gap-4 p-4">
+                      {[...Array(4)].map((_, i) => (
+                        <Skeleton key={i} className="h-4 w-full" />
+                      ))}
+                    </div>
+                    <div className="space-y-3 p-4">
+                      {[...Array(3)].map((_, row) => (
+                        <div key={row} className="grid grid-cols-4 gap-4">
+                          {[...Array(4)].map((_, col) => (
+                            <Skeleton key={col} className="h-4 w-full" />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Connected Accounts (skeleton) */}
+              <Card variant="accent">
+                <CardHeader>
+                  <Skeleton className="h-6 w-44" />
+                  <Skeleton className="mt-2 h-4 w-56" />
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {[...Array(2)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between rounded-lg border p-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-4 w-4" />
+                          <div className="space-y-2">
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-3 w-40" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-4 w-8" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right column (Actions) */}
+            <div className="space-y-4">
+              <Card variant="accent">
+                <CardHeader>
+                  <Skeleton className="h-6 w-20" />
+                  <Skeleton className="mt-2 h-4 w-40" />
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {[...Array(3)].map((_, i) => (
+                      <Skeleton key={i} className="h-9 w-full" />
+                    ))}
+                  </div>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    {[...Array(2)].map((_, i) => (
+                      <Skeleton key={i} className="h-9 w-full" />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </PageContent>
       </PageWrapper>
@@ -189,13 +299,11 @@ export function AdminUserDetailView({ id }: { id: string }) {
                       )}
                       <Badge
                         variant={
-                          user.role === 'admin' || user.role === 'superadmin'
-                            ? 'primary'
-                            : 'secondary'
+                          user.role === 'admin' ? 'primary' : 'secondary'
                         }
                         appearance="outline"
                       >
-                        {user.role || 'user'}
+                        {capitalizeFirstLetter(user.role || 'user')}
                       </Badge>
                     </div>
                   </div>
@@ -524,21 +632,27 @@ export function AdminUserDetailView({ id }: { id: string }) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change User Role</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="mt-2">
               Update {user.name}'s role and permissions.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            <div className="grid grid-cols-3 gap-2">
-              {['user', 'admin', 'superadmin'].map((role) => (
-                <Button
-                  key={role}
-                  variant={selectedRole === role ? 'primary' : 'outline'}
-                  onClick={() => setSelectedRole(role)}
-                >
-                  {role}
-                </Button>
-              ))}
+          <div className="space-y-3">
+            <div className="rounded-lg border bg-muted/40 p-1">
+              <div className="grid grid-cols-2 gap-1">
+                {ROLE_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt.key}
+                    type="button"
+                    size="sm"
+                    variant={selectedRole === opt.key ? 'primary' : 'ghost'}
+                    className="w-full justify-center"
+                    aria-pressed={selectedRole === opt.key}
+                    onClick={() => setSelectedRole(opt.key)}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
           <DialogFooter>
@@ -550,12 +664,16 @@ export function AdminUserDetailView({ id }: { id: string }) {
                 updateRole.mutate(
                   {
                     userId: user.id,
-                    role: selectedRole as 'user' | 'admin' | 'superadmin',
+                    role: selectedRole as 'user' | 'admin',
                   },
                   { onSuccess: roleDialog.close }
                 )
               }
-              disabled={updateRole.isPending || selectedRole === user.role}
+              disabled={
+                updateRole.isPending ||
+                !selectedRole ||
+                selectedRole === user.role
+              }
             >
               Update Role
             </Button>

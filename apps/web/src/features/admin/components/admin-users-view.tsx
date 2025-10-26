@@ -7,6 +7,7 @@ import {
 } from '@/components/page-structure';
 import { useAdminUsersQuery } from '@/features/admin/queries/admin.queries';
 import { useDebouncedState } from '@/hooks/use-debounced-state';
+import { capitalizeFirstLetter } from '@/utils/capitalize-first-letter';
 import { formatDate } from '@/utils/format-date';
 import {
   ColumnDef,
@@ -30,6 +31,7 @@ import { DataGridColumnHeader } from '@workspace/ui/components/data-grid-column-
 import { DataGridPagination } from '@workspace/ui/components/data-grid-pagination';
 import { DataGridTable } from '@workspace/ui/components/data-grid-table';
 import { Input, InputWrapper } from '@workspace/ui/components/input';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import { SearchIcon, UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -40,7 +42,7 @@ type AdminUser = {
   email: string | null;
   emailVerified: boolean | null;
   image: string | null;
-  role: 'user' | 'admin' | 'superadmin' | null;
+  role: 'user' | 'admin' | null;
   banned: boolean | null;
   createdAt: string | Date;
   _count: { sessions: number };
@@ -104,12 +106,12 @@ export function AdminUsersView() {
         enableSorting: true,
         meta: {
           headerTitle: 'User',
-          // skeleton: (
-          //   <div className="flex items-center gap-3">
-          //     <Skeleton className="h-10 w-10 rounded-full" />
-          //     <Skeleton className="h-4 w-[150px]" />
-          //   </div>
-          // ),
+          skeleton: (
+            <div className="flex items-center gap-3">
+              <Skeleton className="size-8 rounded-full" />
+              <Skeleton className="h-4 w-[150px]" />
+            </div>
+          ),
         },
         cell: ({ row }) => {
           const user = row.original;
@@ -144,7 +146,7 @@ export function AdminUsersView() {
         enableSorting: true,
         meta: {
           headerTitle: 'Email',
-          // skeleton: <Skeleton className="h-4 w-[200px]" />,
+          skeleton: <Skeleton className="h-4 w-[200px]" />,
         },
         cell: ({ row }) => <span>{row.original.email}</span>,
       },
@@ -156,7 +158,7 @@ export function AdminUsersView() {
         enableSorting: false,
         meta: {
           headerTitle: 'Status',
-          // skeleton: <Skeleton className="h-5 w-[80px]" />,
+          skeleton: <Skeleton className="h-5 w-20" />,
         },
         cell: ({ row }) => {
           const user = row.original;
@@ -184,21 +186,17 @@ export function AdminUsersView() {
         enableSorting: false,
         meta: {
           headerTitle: 'Role',
-          // skeleton: <Skeleton className="h-5 w-[60px]" />,
+          skeleton: <Skeleton className="h-5 w-[60px]" />,
         },
         cell: ({ row }) => {
           const user = row.original;
           return (
             <Badge
-              variant={
-                user.role === 'admin' || user.role === 'superadmin'
-                  ? 'primary'
-                  : 'secondary'
-              }
+              variant={user.role === 'admin' ? 'primary' : 'secondary'}
               appearance="outline"
               size="sm"
             >
-              {user.role || 'user'}
+              {capitalizeFirstLetter(user.role || 'user')}
             </Badge>
           );
         },
@@ -212,7 +210,7 @@ export function AdminUsersView() {
         enableSorting: true,
         meta: {
           headerTitle: 'Joined',
-          // skeleton: <Skeleton className="h-4 w-[100px]" />,
+          skeleton: <Skeleton className="h-4 w-[100px]" />,
         },
         cell: ({ row }) => (
           <span className="text-sm text-muted-foreground">
@@ -228,7 +226,7 @@ export function AdminUsersView() {
         enableSorting: false,
         meta: {
           headerTitle: 'Actions',
-          // skeleton: <Skeleton className="h-9 w-[80px]" />,
+          skeleton: <Skeleton className="h-6 w-20" />,
         },
         cell: ({ row }) => (
           <Button asChild size="sm" variant="outline">
@@ -281,12 +279,13 @@ export function AdminUsersView() {
             recordCount={data?.total ?? 0}
             isLoading={isLoading}
             tableLayout={{
-              stripped: true,
-              rowRounded: true,
+              stripped: false,
+              rowRounded: false,
+              dense: true,
             }}
           >
             <div className="w-full space-y-2.5">
-              <DataGridContainer border={false}>
+              <DataGridContainer>
                 <DataGridTable />
               </DataGridContainer>
               <DataGridPagination

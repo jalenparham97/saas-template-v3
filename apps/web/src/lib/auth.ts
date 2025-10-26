@@ -17,9 +17,7 @@ export const auth = betterAuth({
     provider: 'postgresql',
   }),
   plugins: [
-    admin({
-      adminRoles: ['admin', 'superadmin'],
-    }),
+    admin(),
     openAPI(),
     stripe({
       stripeClient: stripeApiClient,
@@ -86,6 +84,9 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
     },
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 90, // Session expires in 90 days
   },
   // socialProviders: {
   //   google: {
