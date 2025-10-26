@@ -5,7 +5,6 @@ import {
   useUserUpdateMutation,
 } from '@/features/auth/queries/auth.queries';
 import { authClient } from '@/lib/auth-client';
-import { APP_ROUTES } from '@/lib/constants';
 import { useZodForm } from '@workspace/react-form';
 import {
   Alert,
@@ -59,7 +58,7 @@ export function SignUpForm() {
       name: data.name,
       email: data.email,
       password: data.password,
-      callbackURL: APP_ROUTES.DASHBOARD,
+      callbackURL: `/verify?email=${encodeURIComponent(data.email)}`,
       fetchOptions: {
         onSuccess: async (ctx) => {
           const user = ctx.data.user as User;
@@ -69,7 +68,7 @@ export function SignUpForm() {
           await updateUserMutation.mutateAsync({
             image: userImage,
           });
-          router.push(APP_ROUTES.DASHBOARD);
+          router.push(`/verify?email=${encodeURIComponent(data.email)}`);
         },
         onError: (ctx) => {
           setError(ctx.error.message);

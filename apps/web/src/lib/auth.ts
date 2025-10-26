@@ -1,5 +1,9 @@
 import { env } from '@/env';
-import { sendEmailChangeEmail, sendPasswordResetEmail } from '@/lib/mail';
+import {
+  sendEmailChangeEmail,
+  sendPasswordResetEmail,
+  sendVerifyEmail,
+} from '@/lib/mail';
 import { stripeApiClient } from '@/lib/stripe';
 import { stripe } from '@better-auth/stripe';
 import { db } from '@workspace/database';
@@ -63,6 +67,14 @@ export const auth = betterAuth({
       await sendPasswordResetEmail(user.email, url);
     },
   },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      console.log('Send verify email', user.email, url);
+      await sendVerifyEmail(user.email, url);
+    },
+  },
   user: {
     changeEmail: {
       enabled: true,
@@ -75,14 +87,6 @@ export const auth = betterAuth({
       enabled: true,
     },
   },
-  // emailVerification: {
-  //   sendOnSignUp: true,
-  //   autoSignInAfterVerification: true,
-  //   sendVerificationEmail: async ({ user, url }) => {
-  //     // await sendVerifyEmail(user.email, url);
-  //     console.log('Send verify email', user.email, url);
-  //   },
-  // },
   // socialProviders: {
   //   google: {
   //     clientId: env.GOOGLE_CLIENT_ID,
