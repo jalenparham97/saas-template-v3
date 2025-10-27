@@ -11,7 +11,8 @@
     "db:deploy": "turbo db:deploy",
     "db:studio": "turbo db:studio",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "postinstall": "turbo db:generate"
   },
   "devDependencies": {
     "@workspace/eslint-config": "*",
