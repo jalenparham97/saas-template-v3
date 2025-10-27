@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "prebuild": "turbo run db:generate --filter=@workspace/database",
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
