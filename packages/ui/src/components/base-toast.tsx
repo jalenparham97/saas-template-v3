@@ -1,15 +1,33 @@
 'use client';
 
+import { Toast } from '@base-ui-components/react/toast';
 import { toastManager, useToast } from '@workspace/ui/hooks/use-toast';
 import { cn } from '@workspace/ui/lib/utils';
-import { buttonVariants } from '@workspace/ui/components/base-button';
-import { Toast } from '@base-ui-components/react/toast';
 import { cva } from 'class-variance-authority';
-import { CircleAlert, CircleCheck, Info, Loader, TriangleAlert, X } from 'lucide-react';
+import {
+  CircleAlert,
+  CircleCheck,
+  Info,
+  Loader,
+  TriangleAlert,
+  X,
+} from 'lucide-react';
 
-export type ToastType = 'default' | 'loading' | 'success' | 'error' | 'info' | 'warning';
+export type ToastType =
+  | 'default'
+  | 'loading'
+  | 'success'
+  | 'error'
+  | 'info'
+  | 'warning';
 
-export type ToastPosition = 'top-center' | 'top-right' | 'top-left' | 'bottom-center' | 'bottom-right' | 'bottom-left';
+export type ToastPosition =
+  | 'top-center'
+  | 'top-right'
+  | 'top-left'
+  | 'bottom-center'
+  | 'bottom-right'
+  | 'bottom-left';
 
 export type ToastTimeout = number;
 
@@ -47,7 +65,8 @@ const toastVariants = cva(
         'top-center': 'start-1/2 -translate-x-1/2 top-0 after:top-full',
         'top-right': 'end-0 top-0 after:top-full',
         'top-left': 'start-0 top-0 after:top-full',
-        'bottom-center': 'start-1/2 -translate-x-1/2 bottom-0 after:bottom-full',
+        'bottom-center':
+          'start-1/2 -translate-x-1/2 bottom-0 after:bottom-full',
         'bottom-right': 'end-0 bottom-0 after:bottom-full',
         'bottom-left': 'start-0 bottom-0 after:bottom-full',
       },
@@ -55,14 +74,16 @@ const toastVariants = cva(
     defaultVariants: {
       position: 'bottom-right',
     },
-  },
+  }
 );
 
 const toastTypeVariants = cva('rounded-lg', {
   variants: {
     type: {
-      loading: 'bg-popover text-popover-foreground border border-border shadow-lg',
-      default: 'bg-popover text-popover-foreground border border-border shadow-lg',
+      loading:
+        'bg-popover text-popover-foreground border border-border shadow-lg',
+      default:
+        'bg-popover text-popover-foreground border border-border shadow-lg',
       error: 'bg-destructive text-destructive-foreground',
       success:
         'bg-[var(--color-success,var(--color-green-500))] text-[var(--color-success-foreground,var(--color-white))]',
@@ -102,7 +123,8 @@ const TOAST_ICONS: {
   warning: <TriangleAlert />,
 };
 
-interface ToastProviderProps extends Omit<React.ComponentProps<typeof Toast.Provider>, 'toastManager'> {
+interface ToastProviderProps
+  extends Omit<React.ComponentProps<typeof Toast.Provider>, 'toastManager'> {
   position?: ToastPosition;
   timeout?: ToastTimeout;
   swipeDirection?: ToastSwipeDirection[];
@@ -120,9 +142,18 @@ function ToastProvider({
   ...props
 }: ToastProviderProps) {
   return (
-    <Toast.Provider toastManager={toastManager} timeout={timeout} limit={limit} {...props}>
+    <Toast.Provider
+      toastManager={toastManager}
+      timeout={timeout}
+      limit={limit}
+      {...props}
+    >
       {children}
-      <ToastList position={position} swipeDirection={swipeDirection} showCloseButton={showCloseButton} />
+      <ToastList
+        position={position}
+        swipeDirection={swipeDirection}
+        showCloseButton={showCloseButton}
+      />
     </Toast.Provider>
   );
 }
@@ -133,11 +164,15 @@ interface CustomToastData {
   position?: ToastPosition;
 }
 
-function isCustomToast(toast: Toast.Root.ToastObject): toast is Toast.Root.ToastObject<CustomToastData> {
+function isCustomToast(
+  toast: Toast.Root.ToastObject
+): toast is Toast.Root.ToastObject<CustomToastData> {
   return toast.data?.content !== undefined;
 }
 
-function getDefaultSwipeDirection(position: ToastPosition): ToastSwipeDirection[] {
+function getDefaultSwipeDirection(
+  position: ToastPosition
+): ToastSwipeDirection[] {
   switch (position) {
     case 'top-center':
       return ['up', 'right', 'left'];
@@ -161,7 +196,11 @@ interface ToastListProps {
   showCloseButton: boolean;
 }
 
-function ToastList({ position, swipeDirection, showCloseButton }: ToastListProps) {
+function ToastList({
+  position,
+  swipeDirection,
+  showCloseButton,
+}: ToastListProps) {
   const { toasts } = useToast();
 
   // Group toasts by position (individual or default)
@@ -174,93 +213,108 @@ function ToastList({ position, swipeDirection, showCloseButton }: ToastListProps
       groups[toastPosition].push(toast);
       return groups;
     },
-    {} as Record<ToastPosition, typeof toasts>,
+    {} as Record<ToastPosition, typeof toasts>
   );
 
   return (
     <>
-      {Object.entries(toastsByPosition).map(([toastPosition, positionToasts]) => {
-        const currentSwipeDirection = swipeDirection || getDefaultSwipeDirection(toastPosition as ToastPosition);
+      {Object.entries(toastsByPosition).map(
+        ([toastPosition, positionToasts]) => {
+          const currentSwipeDirection =
+            swipeDirection ||
+            getDefaultSwipeDirection(toastPosition as ToastPosition);
 
-        return (
-          <Toast.Portal data-slot="toast-portal" key={toastPosition}>
-            <Toast.Viewport
-              className={cn(toastContainerVariants({ position: toastPosition as ToastPosition }))}
-              data-slot="toast-viewport"
-              data-position={toastPosition}
-            >
-              {positionToasts.map((toast, index) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const type = (toast as any).type || 'default';
-                return (
-                  <Toast.Root
-                    key={toast.id}
-                    toast={toast}
-                    swipeDirection={currentSwipeDirection}
-                    data-slot="toast"
-                    data-position={toastPosition}
-                    data-type={type}
-                    className={cn(
-                      toastVariants({
-                        position: toastPosition as ToastPosition,
-                      }),
-                    )}
-                    style={{
-                      ['--gap' as string]: '0.8rem',
-                      ['--toast-index' as string]: index.toString(),
-                      ['--offset-y' as string]: toastPosition.startsWith('top')
-                        ? 'calc(var(--toast-offset-y) + (var(--toast-index) * var(--gap)) + var(--toast-swipe-movement-y))'
-                        : 'calc(var(--toast-offset-y) * -1 + (var(--toast-index) * var(--gap) * -1) + var(--toast-swipe-movement-y))',
-                    }}
-                  >
-                    {isCustomToast(toast) && toast.data ? (
-                      <div data-slot="toast-wrapper">{toast.data.content}</div>
-                    ) : (
-                      <div
-                        className={cn(
-                          'flex items-center justify-between gap-2 p-4 w-full',
-                          toastTypeVariants({ type: type as ToastType }),
-                        )}
-                        data-slot="toast-wrapper"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          {type && TOAST_ICONS[type] && (
-                            <div
-                              className="shrink-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-                              data-slot="toast-icon"
-                            >
-                              {TOAST_ICONS[type]}
-                            </div>
-                          )}
-                          <div className="flex flex-col">
-                            <Toast.Title
-                              className="text-sm leading-relaxed font-semibold m-0"
-                              data-slot="toast-title"
-                            />
-                            <Toast.Description className="text-xs leading-normal" data-slot="toast-description" />
-                          </div>
+          return (
+            <Toast.Portal data-slot="toast-portal" key={toastPosition}>
+              <Toast.Viewport
+                className={cn(
+                  toastContainerVariants({
+                    position: toastPosition as ToastPosition,
+                  })
+                )}
+                data-slot="toast-viewport"
+                data-position={toastPosition}
+              >
+                {positionToasts.map((toast, index) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const type = (toast as any).type || 'default';
+                  return (
+                    <Toast.Root
+                      key={toast.id}
+                      toast={toast}
+                      swipeDirection={currentSwipeDirection}
+                      data-slot="toast"
+                      data-position={toastPosition}
+                      data-type={type}
+                      className={cn(
+                        toastVariants({
+                          position: toastPosition as ToastPosition,
+                        })
+                      )}
+                      style={{
+                        ['--gap' as string]: '0.8rem',
+                        ['--toast-index' as string]: index.toString(),
+                        ['--offset-y' as string]: toastPosition.startsWith(
+                          'top'
+                        )
+                          ? 'calc(var(--toast-offset-y) + (var(--toast-index) * var(--gap)) + var(--toast-swipe-movement-y))'
+                          : 'calc(var(--toast-offset-y) * -1 + (var(--toast-index) * var(--gap) * -1) + var(--toast-swipe-movement-y))',
+                      }}
+                    >
+                      {isCustomToast(toast) && toast.data ? (
+                        <div data-slot="toast-wrapper">
+                          {toast.data.content}
                         </div>
-
-                        {(toast.data?.close || showCloseButton) && (
-                          <Toast.Close
-                            className={cn(
-                              'absolute top-2 end-2 [&_svg]:size-3.5 [&_svg]:opacity-60 hover:[&_svg]:opacity-100 cursor-pointer',
+                      ) : (
+                        <div
+                          className={cn(
+                            'flex items-center justify-between gap-2 p-4 w-full',
+                            toastTypeVariants({ type: type as ToastType })
+                          )}
+                          data-slot="toast-wrapper"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            {type && TOAST_ICONS[type] && (
+                              <div
+                                className="shrink-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+                                data-slot="toast-icon"
+                              >
+                                {TOAST_ICONS[type]}
+                              </div>
                             )}
-                            data-slot="toast-action"
-                            aria-label="Close"
-                          >
-                            <X />
-                          </Toast.Close>
-                        )}
-                      </div>
-                    )}
-                  </Toast.Root>
-                );
-              })}
-            </Toast.Viewport>
-          </Toast.Portal>
-        );
-      })}
+                            <div className="flex flex-col">
+                              <Toast.Title
+                                className="text-sm leading-relaxed font-semibold m-0"
+                                data-slot="toast-title"
+                              />
+                              <Toast.Description
+                                className="text-xs leading-normal"
+                                data-slot="toast-description"
+                              />
+                            </div>
+                          </div>
+
+                          {(toast.data?.close || showCloseButton) && (
+                            <Toast.Close
+                              className={cn(
+                                'absolute top-2 end-2 [&_svg]:size-3.5 [&_svg]:opacity-60 hover:[&_svg]:opacity-100 cursor-pointer'
+                              )}
+                              data-slot="toast-action"
+                              aria-label="Close"
+                            >
+                              <X />
+                            </Toast.Close>
+                          )}
+                        </div>
+                      )}
+                    </Toast.Root>
+                  );
+                })}
+              </Toast.Viewport>
+            </Toast.Portal>
+          );
+        }
+      )}
     </>
   );
 }

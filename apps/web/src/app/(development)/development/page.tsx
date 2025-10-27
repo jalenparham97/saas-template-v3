@@ -23,7 +23,7 @@ const formSchema = z.object({
   email: z.email({ error: 'Please enter a valid email address.' }),
 });
 
-export default function Page() {
+export default function DevelopmentPage() {
   // Use the form hook with the schema
   const form = useZodForm({
     schema: formSchema,

@@ -2,6 +2,14 @@
 const nextConfig = {
   transpilePackages: ['@workspace/ui'],
 
+  redirects: async () => [
+    {
+      source: '/',
+      destination: '/dashboard',
+      permanent: true,
+    },
+  ],
+
   // Security headers
   headers: async () => [
     {
