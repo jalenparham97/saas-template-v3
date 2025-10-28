@@ -13,18 +13,13 @@ export const APP_ROUTES = {
  * An array of routes that are accessible to the public
  * These routes do not require authentication
  */
-export const publicRoutes = ['/api/webhooks/stripe'];
+export const publicRoutes = ['/api/webhooks/stripe', '/reset-password'];
 
 /**
  * An array of routes that are used for authentication
  * These routes will redirect logged in users to /dashboard
  */
-export const authRoutes = [
-  '/login',
-  '/signup',
-  '/forgot-password',
-  '/reset-password',
-];
+export const authRoutes = ['/login', '/signup', '/forgot-password'];
 
 /**
  * The prefix for API authentication routes

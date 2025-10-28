@@ -127,6 +127,7 @@ export function useUserPasswordResetMutation({
           title: 'Email sent',
           description: 'Password reset email has been sent to your inbox.',
           data: { close: true },
+          type: 'success',
         });
       };
       if (customOnSuccess) {
