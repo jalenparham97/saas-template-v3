@@ -41,6 +41,11 @@ const data = {
   ],
 };
 
+/**
+ * The main sidebar for the app.
+ * @example
+ * <AppSidebar />
+ */
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="sidebar" {...props}>
