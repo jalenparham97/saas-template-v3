@@ -1,9 +1,12 @@
 'use client';
 
 import { DeleteDialog } from '@/components/delete-dialog';
+import GoogleIcon from '@/components/icons/google-icon.svg';
+import { useUser } from '@/features/auth/queries/auth.queries';
 import { SettingsSection } from '@/features/settings/components/settings-section';
 import {
   useChangePasswordMutation,
+  useDisconnectAccountMutation,
   useSignOutAllDevicesMutation,
 } from '@/features/settings/queries/security.queries';
 import { ChangePasswordSchema } from '@/schemas/auth.schemas';
@@ -32,6 +35,7 @@ import {
 } from '@workspace/ui/components/input-field';
 import { Separator } from '@workspace/ui/components/separator';
 import { CheckCircle2 } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 import type { z } from 'zod/v4';
 
@@ -49,8 +53,11 @@ export function SecuritySettings() {
     },
   });
 
+  const userQuery = useUser();
+
   const changePasswordMutation = useChangePasswordMutation();
   const signOutAllMutation = useSignOutAllDevicesMutation();
+  const disconnectAccountMutation = useDisconnectAccountMutation();
 
   const handleChangePassword = async (data: ChangePasswordFormData) => {
     await changePasswordMutation.mutateAsync(data);
@@ -61,6 +68,18 @@ export function SecuritySettings() {
   const handleSignOutAllDevices = async () => {
     await signOutAllMutation.mutateAsync();
   };
+
+  const handleDisconnectAccount = async (providerId: string) => {
+    await disconnectAccountMutation.mutateAsync(providerId);
+  };
+
+  // Connected accounts (exclude credential provider)
+  const connectedAccounts =
+    userQuery.data?.accounts.filter((acc) => acc.providerId !== 'credential') ??
+    [];
+
+  const isLoadingAccounts = userQuery.isLoading;
+  const hasConnectedAccounts = connectedAccounts.length > 0;
 
   return (
     <div className="space-y-10">
@@ -153,6 +172,74 @@ export function SecuritySettings() {
               Update password
             </Button>
           </CardFooter>
+        </Card>
+      </SettingsSection>
+
+      <Separator className="my-12" />
+
+      <SettingsSection>
+        <div>
+          <h3 className="text-base font-semibold leading-7">
+            Connected accounts
+          </h3>
+          <p className="text-muted-foreground mt-1 text-sm leading-6">
+            Keep your account secure by connecting multiple authentication
+            methods.
+          </p>
+        </div>
+
+        <Card variant="accent" className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Connected accounts</CardTitle>
+            <CardDescription className="hidden xl:block text-sm text-muted-foreground">
+              Use your third party accounts to sign in securely.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {isLoadingAccounts && (
+              <p className="text-sm text-muted-foreground">Loading accounts…</p>
+            )}
+            {!isLoadingAccounts && !hasConnectedAccounts && (
+              <p className="text-sm text-muted-foreground">
+                You don&apos;t have any connected accounts.
+              </p>
+            )}
+            {!isLoadingAccounts && hasConnectedAccounts && (
+              <div className="space-y-3">
+                {connectedAccounts.map((account) => (
+                  <div
+                    key={account.id}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
+                    <div className="flex items-center gap-5">
+                      {account.providerId === 'google' && (
+                        <Image
+                          alt="Google"
+                          src={GoogleIcon}
+                          className="size-7"
+                        />
+                      )}
+                      <div>
+                        <p className="font-semibold capitalize">
+                          {account.providerId.replace('-', ' ')}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      appearance="ghost"
+                      onClick={() =>
+                        handleDisconnectAccount(account.providerId)
+                      }
+                      loading={disconnectAccountMutation.isPending}
+                    >
+                      Disconnect
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
         </Card>
       </SettingsSection>
 
