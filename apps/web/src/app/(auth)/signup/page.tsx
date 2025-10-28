@@ -1,4 +1,11 @@
 import { SignUpForm } from '@/features/auth/components/signup-form';
+import { APP_NAME } from '@/lib/constants';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: `Sign Up - ${APP_NAME}`,
+  description: 'Create a new account',
+};
 
 export default function SignUpPage() {
   return (

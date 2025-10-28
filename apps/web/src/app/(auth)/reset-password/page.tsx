@@ -1,4 +1,11 @@
 import { ResetPasswordForm } from '@/features/auth/components/reset-password-form';
+import { APP_NAME } from '@/lib/constants';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: `Reset Password - ${APP_NAME}`,
+  description: 'Enter a new password',
+};
 
 // This page relies on URL search params (e.g., `?token=`) via a Client Component.
 // During static prerender (build-time), there is no request URL, which can cause
