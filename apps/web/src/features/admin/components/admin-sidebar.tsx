@@ -9,7 +9,7 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from '@workspace/ui/components/sidebar';
-import { LayoutDashboardIcon } from 'lucide-react';
+import { ArrowLeftIcon } from 'lucide-react';
 
 export function AdminSidebar({
   ...props
@@ -28,7 +28,7 @@ export function AdminSidebar({
             {
               title: 'Back to App',
               url: '/dashboard',
-              icon: LayoutDashboardIcon,
+              icon: ArrowLeftIcon,
             },
           ]}
         />

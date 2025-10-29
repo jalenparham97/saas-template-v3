@@ -1,3 +1,4 @@
+import { MobileTopbar } from '@/components/mobile-topbar';
 import { AdminSidebar } from '@/features/admin/components/admin-sidebar';
 import { auth } from '@/lib/auth';
 import { APP_NAME } from '@/lib/constants';
@@ -31,6 +32,7 @@ export default async function AdminLayout({
     <SidebarProvider>
       <AdminSidebar />
       <SidebarInset>
+        <MobileTopbar showBackToApp />
         <div className="flex flex-1 flex-col">{children}</div>
       </SidebarInset>
     </SidebarProvider>

@@ -6,7 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@workspace/ui/components/sidebar';
-import { LayoutDashboardIcon, Settings2Icon } from 'lucide-react';
+import { HomeIcon, SettingsIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSelectedLayoutSegment } from 'next/navigation';
 
@@ -22,13 +22,13 @@ export function NavMain() {
     {
       title: 'Dashboard',
       url: '/dashboard',
-      icon: LayoutDashboardIcon,
+      icon: HomeIcon,
       isActive: true,
     },
     {
       title: 'Settings',
       url: '/settings',
-      icon: Settings2Icon,
+      icon: SettingsIcon,
     },
   ];
 

@@ -7,7 +7,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@workspace/ui/components/sidebar';
-import { LayoutDashboardIcon, UsersIcon } from 'lucide-react';
+import { HomeIcon, UsersIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSelectedLayoutSegment } from 'next/navigation';
 
@@ -24,7 +24,7 @@ export function AdminNavMain() {
     {
       title: 'Overview',
       url: '/admin',
-      icon: LayoutDashboardIcon,
+      icon: HomeIcon,
     },
     {
       title: 'Users',
