@@ -268,7 +268,9 @@ export function AdminUserDetailView({ id }: { id: string }) {
             <Card variant="accent">
               <CardHeader>
                 <CardTitle>User Information</CardTitle>
-                <CardDescription>Basic account details</CardDescription>
+                <CardDescription className="hidden xl:block">
+                  Basic account details
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-4">
@@ -378,44 +380,106 @@ export function AdminUserDetailView({ id }: { id: string }) {
                     No active sessions
                   </p>
                 ) : (
-                  <div className="rounded-lg border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>IP Address</TableHead>
-                          <TableHead>Device</TableHead>
-                          <TableHead>Created</TableHead>
-                          <TableHead>Expires</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {user.sessions.map((session) => (
-                          <TableRow key={session.id}>
-                            <TableCell className="font-mono text-sm">
+                  <>
+                    {/* Mobile (spacious stacked cards) */}
+                    <div className="md:hidden grid gap-3">
+                      {user.sessions.map((session) => (
+                        <div
+                          key={session.id}
+                          className="rounded-lg border p-4 space-y-3 bg-background"
+                        >
+                          <div>
+                            <p className="text-xs text-muted-foreground">
+                              IP Address
+                            </p>
+                            <p className="font-mono text-base">
                               {session.ipAddress || 'N/A'}
-                            </TableCell>
-                            <TableCell className="text-sm">
-                              {session.userAgent
-                                ? session.userAgent.slice(0, 30) + '...'
-                                : 'N/A'}
-                            </TableCell>
-                            <TableCell className="text-sm">
-                              {formatDate(
-                                session.createdAt,
-                                'MMM DD, YYYY h:mm A'
-                              )}
-                            </TableCell>
-                            <TableCell className="text-sm">
-                              {formatDate(
-                                session.expiresAt,
-                                'MMM DD, YYYY h:mm A'
-                              )}
-                            </TableCell>
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-muted-foreground">
+                              Device
+                            </p>
+                            <p className="text-sm leading-snug line-clamp-2 wrap-break-word">
+                              {session.userAgent || 'N/A'}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-col gap-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground">
+                                Created
+                              </p>
+                              <p className="text-xs">
+                                {formatDate(
+                                  session.createdAt,
+                                  'MMM DD, YYYY h:mm A'
+                                )}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">
+                                Expires
+                              </p>
+                              <p className="text-xs">
+                                {formatDate(
+                                  session.expiresAt,
+                                  'MMM DD, YYYY h:mm A'
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Desktop/tablet (table) */}
+                    <div className="rounded-lg border overflow-x-auto hidden md:block">
+                      <Table className="min-w-[720px]">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="whitespace-nowrap">
+                              IP Address
+                            </TableHead>
+                            <TableHead className="whitespace-nowrap">
+                              Device
+                            </TableHead>
+                            <TableHead className="whitespace-nowrap">
+                              Created
+                            </TableHead>
+                            <TableHead className="whitespace-nowrap">
+                              Expires
+                            </TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                        </TableHeader>
+                        <TableBody>
+                          {user.sessions.map((session) => (
+                            <TableRow key={session.id}>
+                              <TableCell className="font-mono text-sm whitespace-nowrap">
+                                {session.ipAddress || 'N/A'}
+                              </TableCell>
+                              <TableCell className="text-sm max-w-[260px] truncate">
+                                {session.userAgent || 'N/A'}
+                              </TableCell>
+                              <TableCell className="text-sm whitespace-nowrap">
+                                {formatDate(
+                                  session.createdAt,
+                                  'MMM DD, YYYY h:mm A'
+                                )}
+                              </TableCell>
+                              <TableCell className="text-sm whitespace-nowrap">
+                                {formatDate(
+                                  session.expiresAt,
+                                  'MMM DD, YYYY h:mm A'
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -425,7 +489,7 @@ export function AdminUserDetailView({ id }: { id: string }) {
               <Card variant="accent">
                 <CardHeader>
                   <CardTitle>Connected Accounts</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="hidden xl:block">
                     OAuth providers and authentication methods
                   </CardDescription>
                 </CardHeader>
@@ -461,7 +525,9 @@ export function AdminUserDetailView({ id }: { id: string }) {
             <Card variant="accent">
               <CardHeader>
                 <CardTitle>Actions</CardTitle>
-                <CardDescription>Manage user account</CardDescription>
+                <CardDescription className="hidden xl:block">
+                  Manage user account
+                </CardDescription>
               </CardHeader>
               <CardContent className="">
                 <div className="space-y-2">

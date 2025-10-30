@@ -23,6 +23,7 @@ import {
 } from '@workspace/ui/components/avatar';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
+import { Card, CardContent } from '@workspace/ui/components/card';
 import {
   DataGrid,
   DataGridContainer,
@@ -264,7 +265,7 @@ export function AdminUsersView() {
       </div>
 
       <PageContent>
-        <InputWrapper className="w-[250px]">
+        <InputWrapper className="w-full sm:w-[320px]">
           <SearchIcon className="size-4 text-muted-foreground" />
           <Input
             placeholder="Search users..."
@@ -273,7 +274,111 @@ export function AdminUsersView() {
           />
         </InputWrapper>
 
-        <div className="mt-4">
+        {/* Mobile list (cards) */}
+        <div className="mt-4 md:hidden">
+          <div className="grid gap-3">
+            {isLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i} variant="accent">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="size-10 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-2/3" />
+                          <Skeleton className="h-3 w-1/2" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-5 w-16" />
+                        <Skeleton className="h-5 w-14" />
+                      </div>
+                      <Skeleton className="h-8 w-full" />
+                    </CardContent>
+                  </Card>
+                ))
+              : (data?.users || []).map((user) => (
+                  <Card key={user.id} variant="accent">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="size-10">
+                          <AvatarImage src={user.image || undefined} />
+                          <AvatarFallback>
+                            {user.name?.charAt(0).toUpperCase() || (
+                              <UserIcon className="size-4" />
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <Link
+                            href={`/admin/users/${user.id}`}
+                            className="block font-medium truncate hover:text-blue-500"
+                          >
+                            {user.name || user.email}
+                          </Link>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {user.banned ? (
+                          <Badge
+                            variant="destructive"
+                            appearance="outline"
+                            size="sm"
+                          >
+                            Banned
+                          </Badge>
+                        ) : user.emailVerified ? (
+                          <Badge
+                            variant="success"
+                            appearance="outline"
+                            size="sm"
+                          >
+                            Verified
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="warning"
+                            appearance="outline"
+                            size="sm"
+                          >
+                            Unverified
+                          </Badge>
+                        )}
+                        <Badge
+                          variant={
+                            user.role === 'admin' ? 'primary' : 'secondary'
+                          }
+                          appearance="outline"
+                          size="sm"
+                        >
+                          {capitalizeFirstLetter(user.role || 'user')}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          Joined {formatDate(user.createdAt)}
+                        </span>
+                      </div>
+
+                      <div className="flex">
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                        >
+                          <Link href={`/admin/users/${user.id}`}>View</Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+          </div>
+        </div>
+
+        {/* Desktop/tablet table */}
+        <div className="mt-4 hidden md:block">
           <DataGrid
             table={table}
             recordCount={data?.total ?? 0}
